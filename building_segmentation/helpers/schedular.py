@@ -4,7 +4,7 @@ import sys
 import torch.optim.lr_scheduler as lr_scheduler
 
 
-logger = logging.getLogger()
+logger = logging.getLogger("segmentation")
 
 
 def get_scheduler(scheduler: str, **kwargs):

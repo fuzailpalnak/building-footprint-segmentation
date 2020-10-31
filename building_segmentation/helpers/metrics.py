@@ -8,7 +8,7 @@ from building_segmentation.utils.operations import handle_dictionary
 
 EPSILON = 1e-11
 
-logger = logging.getLogger()
+logger = logging.getLogger("segmentation")
 
 
 class MetricList:
@@ -52,13 +52,16 @@ class MetricList:
         :param prediction:
         :return:
         """
+        logger.debug("Computing Metrics")
         computed_metric = dict()
         for metric in self.metrics:
+            logger.debug(f"Metric Computation {metric.__name__}")
             value = metric(ground_truth, prediction)
             computed_metric[metric.__name__] = value
         return computed_metric
 
     def compute_mean(self) -> dict:
+        logger.debug("Computing Metrics Mean")
         mean_metric = dict()
         for key, value in self.metric_value.items():
             assert type(value) in [float, list, np.float64], (

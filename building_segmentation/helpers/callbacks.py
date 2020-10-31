@@ -15,7 +15,7 @@ with warnings.catch_warnings():
     warnings.filterwarnings("ignore")
     from torch.utils.tensorboard import SummaryWriter
 
-logger = logging.getLogger()
+logger = logging.getLogger("segmentation")
 
 
 class CallbackList(object):

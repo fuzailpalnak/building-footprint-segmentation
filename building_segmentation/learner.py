@@ -19,7 +19,7 @@ from building_segmentation.utils.py_network import (
     extract_state,
 )
 
-logger = logging.getLogger()
+logger = logging.getLogger("segmentation")
 
 
 class Learner:
@@ -62,9 +62,11 @@ class Learner:
         step, start_epoch, end_epoch, bst_vld_loss = self.previous_state(
             extract_state(state)
         )
+        logger.debug(f"Resuming State {state}, with, step: {step}, start_epoch: {start_epoch}")
         self.train(start_epoch, end_epoch, step, bst_vld_loss)
 
     def train(self, start_epoch, end_epoch, step: int = 0, bst_vld_loss: float = None):
+        logger.debug(f"Training Begin")
         self.callbacks.on_begin()
         for ongoing_epoch in range(start_epoch, end_epoch):
             epoch_logs = dict()
