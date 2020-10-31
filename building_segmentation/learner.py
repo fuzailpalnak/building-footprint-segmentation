@@ -16,9 +16,7 @@ from building_segmentation.utils.operations import (
 )
 from building_segmentation.utils.py_network import (
     gpu_variable,
-    load_parallel_model,
     extract_state,
-    adjust_model,
 )
 
 logger = logging.getLogger()
@@ -39,25 +37,36 @@ class Learner:
             self.callbacks.append(SchedulerCallback(scheduler))
 
     def previous_state(self, state):
-        self.model.load_state_dict(adjust_model(state))
+        assert {
+            "model",
+            "optimizer",
+            "step",
+            "start_epoch",
+            "end_epoch",
+            "bst_vld_loss",
+        } == set(list(state.keys())), (
+            "Expected 'state' to have ['model', 'optimizer', 'step', 'start_epoch', 'end_epoch', 'bst_vld_loss']'"
+            "got %s",
+            (list(state.keys()),),
+        )
+        self.model.load_state_dict(state["model"])
         self.optimizer.load_state_dict(state["optimizer"])
         return (
             state["step"],
-            state["ongoing_epoch"],
+            state["start_epoch"],
             state["end_epoch"],
             state["bst_vld_loss"],
         )
 
     def resume(self, state: str):
-        step, ongoing_epoch, end_epoch, bst_vld_loss = self.previous_state(
+        step, start_epoch, end_epoch, bst_vld_loss = self.previous_state(
             extract_state(state)
         )
-        self.train(ongoing_epoch + 1, end_epoch, step, bst_vld_loss)
+        self.train(start_epoch, end_epoch, step, bst_vld_loss)
 
     def train(self, start_epoch, end_epoch, step: int = 0, bst_vld_loss: float = None):
-        self.model = load_parallel_model(self.model)
         self.callbacks.on_begin()
-        for ongoing_epoch in range(start_epoch, end_epoch + 1):
+        for ongoing_epoch in range(start_epoch, end_epoch):
             epoch_logs = dict()
             random.seed()
 
@@ -117,34 +126,58 @@ class Learner:
 
                 one_liner.one_line(
                     tag="Loss",
-                    tag_data=f"Epoch: {ongoing_epoch}, train: {train_loss}, validation: {valid_loss}",
+                    tag_data=f"train: {train_loss}, validation: {valid_loss}",
                     tag_color="cyan",
                     to_reset_data=True,
-                    to_new_line_data=True,
                 )
 
                 one_liner.one_line(
                     tag="Train Metric",
-                    tag_data=f"{dict_to_string(train_metric)}",
+                    tag_data=dict_to_string(train_metric),
                     tag_color="cyan",
                     to_reset_data=True,
                     to_new_line_data=True,
                 )
                 one_liner.one_line(
                     tag="Valid Metric",
-                    tag_data=f"{dict_to_string(valid_metric)}",
+                    tag_data=dict_to_string(valid_metric),
                     tag_color="cyan",
                     to_new_line_data=True,
                     to_reset_data=True,
                 )
 
+            except KeyboardInterrupt:
+                progress_bar.close()
+                self.callbacks.interruption(
+                    logs={
+                        **epoch_logs,
+                        **self.collect_state(
+                            ongoing_epoch, end_epoch, step, bst_vld_loss, "interruption"
+                        ),
+                    }
+                )
+
+                one_liner.one_line(
+                    tag="KeyBoard Interrupt",
+                    tag_data=f"State Saved at epoch {ongoing_epoch}",
+                    tag_color="cyan",
+                    to_reset_data=True,
+                )
+                raise KeyboardInterrupt
             except Exception as ex:
-                print(ex)
-                exit(1)
+                progress_bar.close()
+                raise ex
+
+        one_liner.one_line(
+            tag="Training Complete",
+            tag_color="cyan",
+            to_reset_data=True,
+        )
+        self.callbacks.on_end()
 
     def state_train(
         self, step: int, progress_bar
-    ) -> Tuple[Union[int, float], dict, int, tqdm]:
+    ) -> Tuple[Union[int, float], dict, int, tqdm.std.tqdm]:
 
         report_each = 100
         batch_loss = []
@@ -226,7 +259,7 @@ class Learner:
             "optimizer": self.optimizer.state_dict()
             if self.optimizer is not None
             else "NA",
-            "ongoing_epoch": ongoing_epoch
+            "start_epoch": ongoing_epoch + 1
             if run_state == "complete"
             else ongoing_epoch,
             "step": step,
