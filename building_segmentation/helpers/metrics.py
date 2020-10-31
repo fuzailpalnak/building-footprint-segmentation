@@ -8,7 +8,7 @@ from building_segmentation.utils.operations import handle_dictionary
 
 EPSILON = 1e-11
 
-logger = logging.getLogger()
+logger = logging.getLogger("segmentation")
 
 
 class MetricList:
