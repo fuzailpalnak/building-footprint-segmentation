@@ -1,0 +1,36 @@
+Model:
+  name: RefineNet
+  param:
+
+Criterion:
+    name: BinaryCrossEntropy
+    param:
+
+Loader:
+    root: D:\Cypherics\Library\building-footprint-segmentation\data
+    image_normalizer: divide_by_255
+    label_normalizer: binary_label
+    batch_size: 2
+    augmenters:
+      transform:
+        __class_fullname__: albumentations.core.composition.Compose
+        bbox_params: null
+        keypoint_params: null
+        p: 1
+        transforms:
+          - __class_fullname__: albumentations.augmentations.transforms.HorizontalFlip
+            always_apply: False
+            p: 0.5
+
+Metrics:
+  - accuracy
+  - precision
+  - f1
+  - recall
+  - iou
+
+Optimizer:
+  name: Adam
+  param:
+
+log_dir: D:\Cypherics\lib_check\out_data

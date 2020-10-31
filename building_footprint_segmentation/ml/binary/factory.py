@@ -14,17 +14,22 @@ class BinaryFactory(Factory):
         root_folder: str,
         image_normalization: str,
         ground_truth_normalization: str,
+        augmenters: dict,
         batch_size: int,
     ):
         return BinaryLoader.get_data_loader(
-            root_folder, image_normalization, ground_truth_normalization, batch_size
+            root_folder,
+            image_normalization,
+            ground_truth_normalization,
+            augmenters,
+            batch_size,
         )
 
-    def create_network(self, model_name: str, **model_param):
-        return getattr(models, model_name)(**model_param)
+    def create_network(self, name: str, **param):
+        return getattr(models, name)(**param)
 
-    def create_criterion(self, criterion_name: str, **criterion_param):
-        return getattr(criterion, criterion_name)(**criterion_param)
+    def create_criterion(self, name: str, **param):
+        return getattr(criterion, name)(**param)
 
     def create_metrics(self, data_metrics: List[str]) -> MetricList:
         _metrics = list()

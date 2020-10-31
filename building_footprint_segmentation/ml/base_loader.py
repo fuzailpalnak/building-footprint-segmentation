@@ -20,6 +20,7 @@ class BaseLoader(Dataset):
         root_folder: str,
         image_normalization: str,
         ground_truth_normalization: str,
+        augmenters: dict,
         mode: str,
     ):
         self.mode = mode
@@ -27,23 +28,37 @@ class BaseLoader(Dataset):
 
         self.image_normalization = image_normalization
         self.ground_truth_normalization = ground_truth_normalization
+        self.augmenters = augmenters
 
         self.images = sorted(list((self.root_folder / self.mode / "images").glob("*")))
         self.labels = sorted(list((self.root_folder / self.mode / "labels").glob("*")))
 
     @classmethod
     def get_data_loader(
-        cls, root_folder, image_normalization, label_normalization, batch_size
+        cls,
+        root_folder: str,
+        image_normalization: str,
+        label_normalization: str,
+        augmenters: dict,
+        batch_size: int,
     ):
         train_data = DataLoader(
-            dataset=cls(root_folder, image_normalization, label_normalization, "train"),
+            dataset=cls(
+                root_folder,
+                image_normalization,
+                label_normalization,
+                augmenters,
+                "train",
+            ),
             shuffle=True,
             num_workers=0,
             batch_size=batch_size,
             pin_memory=torch.cuda.is_available(),
         )
         val_data = DataLoader(
-            dataset=cls(root_folder, image_normalization, label_normalization, "val"),
+            dataset=cls(
+                root_folder, image_normalization, label_normalization, dict(), "val"
+            ),
             shuffle=True,
             num_workers=0,
             batch_size=batch_size,
@@ -51,7 +66,9 @@ class BaseLoader(Dataset):
         )
 
         test_data = DataLoader(
-            dataset=cls(root_folder, image_normalization, label_normalization, "test"),
+            dataset=cls(
+                root_folder, image_normalization, label_normalization, dict(), "test"
+            ),
             shuffle=True,
             num_workers=0,
             batch_size=batch_size,

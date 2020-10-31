@@ -6,14 +6,19 @@ class Factory:
         pass
 
     def create_loader(
-        self, root_folder, image_normalization, label_normalization, batch_size
+        self,
+        root_folder,
+        image_normalization,
+        label_normalization,
+        augmenters,
+        batch_size,
     ):
         raise NotImplementedError
 
-    def create_network(self, model_name, **model_param):
+    def create_network(self, name, **param):
         raise NotImplementedError
 
-    def create_criterion(self, criterion_name, **criterion_param):
+    def create_criterion(self, name, **param):
         raise NotImplementedError
 
     def create_metrics(self, data_metrics: List[str]):

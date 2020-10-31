@@ -8,7 +8,10 @@ import time
 from py_oneliner import one_liner
 
 from building_footprint_segmentation.utils import date_time
-from building_footprint_segmentation.utils.operations import is_overridden_func, make_directory
+from building_footprint_segmentation.utils.operations import (
+    is_overridden_func,
+    make_directory,
+)
 from building_footprint_segmentation.utils.py_network import adjust_model
 
 with warnings.catch_warnings():
