@@ -4,7 +4,7 @@ from typing import Union
 import numpy as np
 from torch import Tensor
 
-from building_segmentation.utils.operations import handle_dictionary
+from building_footprint_segmentation.utils.operations import handle_dictionary
 
 EPSILON = 1e-11
 

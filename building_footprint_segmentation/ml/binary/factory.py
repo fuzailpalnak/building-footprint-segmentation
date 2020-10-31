@@ -1,11 +1,11 @@
 from typing import List
 
-from building_segmentation.helpers.metrics import MetricList
-from building_segmentation.ml.base_factory import Factory
-from building_segmentation.ml.binary.loader import BinaryLoader
-from building_segmentation.ml.binary import metrics
-from building_segmentation.ml.binary import criterion
-from building_segmentation.ml.binary import models
+from building_footprint_segmentation.helpers.metrics import MetricList
+from building_footprint_segmentation.ml.base_factory import Factory
+from building_footprint_segmentation.ml.binary.loader import BinaryLoader
+from building_footprint_segmentation.ml.binary import metrics
+from building_footprint_segmentation.ml.binary import criterion
+from building_footprint_segmentation.ml.binary import models
 
 
 class BinaryFactory(Factory):

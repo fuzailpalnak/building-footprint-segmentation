@@ -2,10 +2,10 @@ from typing import List
 
 import torch
 
-from building_segmentation.utils.py_network import load_parallel_model
+from building_footprint_segmentation.utils.py_network import load_parallel_model
 
 
-class Extractor:
+class Segmentation:
     def __init__(self, segmentation):
         self.segmentation = segmentation
 
@@ -38,10 +38,10 @@ class Extractor:
         )
 
 
-def init_extractor(segmentation_type: str):
+def init_segmentation(segmentation_type: str):
     if segmentation_type == "binary":
-        from building_segmentation.ml.binary.factory import BinaryFactory
+        from building_footprint_segmentation.ml.binary.factory import BinaryFactory
 
-        return Extractor(BinaryFactory())
+        return Segmentation(BinaryFactory())
     else:
         raise NotImplementedError
