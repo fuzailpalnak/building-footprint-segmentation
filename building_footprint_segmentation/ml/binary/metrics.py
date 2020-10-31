@@ -4,7 +4,7 @@ from typing import Union
 from sklearn.metrics import confusion_matrix
 from torch import Tensor
 
-from building_segmentation.utils.operations import get_numpy, to_binary
+from building_footprint_segmentation.utils.operations import get_numpy, to_binary
 
 
 EPSILON = 1e-11

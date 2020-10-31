@@ -1,8 +1,8 @@
-from building_segmentation.helpers import normalization
+from building_footprint_segmentation.helpers import normalizer
 
-from building_segmentation.ml.base_loader import BaseLoader
-from building_segmentation.utils.operations import load_image
-from building_segmentation.utils.py_network import to_input_image_tensor
+from building_footprint_segmentation.ml.base_loader import BaseLoader
+from building_footprint_segmentation.utils.operations import load_image
+from building_footprint_segmentation.utils.py_network import to_input_image_tensor
 
 
 class BinaryLoader(BaseLoader):
@@ -13,9 +13,9 @@ class BinaryLoader(BaseLoader):
             root_folder, image_normalization, ground_truth_normalization, mode
         )
 
-        self.image_normalization = getattr(normalization, self.image_normalization)
+        self.image_normalization = getattr(normalizer, self.image_normalization)
         self.ground_truth_normalization = getattr(
-            normalization, self.ground_truth_normalization
+            normalizer, self.ground_truth_normalization
         )
 
         # TODO transformation init

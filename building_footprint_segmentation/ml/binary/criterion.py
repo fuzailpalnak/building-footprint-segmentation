@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-from building_segmentation.ml.base_criterion import BaseCriterion
+from building_footprint_segmentation.ml.base_criterion import BaseCriterion
 
 
 class BinaryCrossEntropy(BaseCriterion):

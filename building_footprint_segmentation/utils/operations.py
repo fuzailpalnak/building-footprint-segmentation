@@ -8,8 +8,8 @@ import numpy as np
 import cv2
 from torch import Tensor
 
-from building_segmentation.utils.date_time import get_time
-from building_segmentation.utils.py_network import convert_tensor_to_numpy
+from building_footprint_segmentation.utils.date_time import get_time
+from building_footprint_segmentation.utils.py_network import convert_tensor_to_numpy
 
 
 def handle_dictionary(input_dictionary: dict, key: Any, value: Any) -> dict:

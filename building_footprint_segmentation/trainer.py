@@ -8,13 +8,13 @@ import torch
 import tqdm
 from py_oneliner import one_liner
 
-from building_segmentation.helpers.callbacks import SchedulerCallback
-from building_segmentation.utils.operations import (
+from building_footprint_segmentation.helpers.callbacks import SchedulerCallback
+from building_footprint_segmentation.utils.operations import (
     handle_dictionary,
     compute_eta,
     dict_to_string,
 )
-from building_segmentation.utils.py_network import (
+from building_footprint_segmentation.utils.py_network import (
     gpu_variable,
     extract_state,
 )
@@ -22,7 +22,7 @@ from building_segmentation.utils.py_network import (
 logger = logging.getLogger("segmentation")
 
 
-class Learner:
+class Trainer:
     def __init__(
         self, model, criterion, optimizer, loader, metrics, callbacks, scheduler
     ):
