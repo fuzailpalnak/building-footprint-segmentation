@@ -61,7 +61,10 @@ class MetricList:
     def compute_mean(self) -> dict:
         mean_metric = dict()
         for key, value in self.metric_value.items():
-            assert type(value) is list
+            assert type(value) in [float, list, np.float64], (
+                "Expected to have either ['float', 'list', 'np.float64']" "got %s",
+                (type(value),),
+            )
             mean_value = np.mean(value)
             mean_metric = handle_dictionary(mean_metric, key, mean_value)
         self.metric_value = dict()

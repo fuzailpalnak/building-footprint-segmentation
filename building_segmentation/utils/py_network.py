@@ -56,7 +56,7 @@ def adjust_model(state: dict) -> dict:
 
 
 def gpu_variable(
-    input_variable: Union[List[Tensor], Tuple[Tensor], Dict[Tensor], Tensor]
+    input_variable: Union[List, Tuple, Dict, Tensor]
 ) -> Union[List[Tensor], Tuple[Tensor], Dict, Tensor]:
     """
     :param input_variable:

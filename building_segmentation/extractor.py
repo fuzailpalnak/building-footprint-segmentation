@@ -2,13 +2,17 @@ from typing import List
 
 import torch
 
+from building_segmentation.utils.py_network import load_parallel_model
+
 
 class Extractor:
     def __init__(self, segmentation):
         self.segmentation = segmentation
 
     def load_model(self, model_name: str, **model_param):
-        return self.segmentation.create_network(model_name, **model_param)
+        return load_parallel_model(
+            self.segmentation.create_network(model_name, **model_param)
+        )
 
     def load_criterion(self, criterion_name: str, **criterion_param):
         return self.segmentation.create_criterion(criterion_name, **criterion_param)
