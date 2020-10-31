@@ -8,6 +8,12 @@ logger = logging.getLogger()
 
 
 def get_scheduler(scheduler: str, **kwargs):
+    """
+
+    :param scheduler:
+    :param kwargs:
+    :return:
+    """
     if hasattr(lr_scheduler, scheduler):
         return getattr(lr_scheduler, scheduler)(**kwargs)
     else:

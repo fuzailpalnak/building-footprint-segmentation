@@ -1,4 +1,8 @@
+import numpy as np
+from typing import Union
+
 from sklearn.metrics import confusion_matrix
+from torch import Tensor
 
 from building_segmentation.utils.operations import get_numpy, to_binary
 
@@ -6,7 +10,15 @@ from building_segmentation.utils.operations import get_numpy, to_binary
 EPSILON = 1e-11
 
 
-def accuracy(ground_truth, prediction):
+def accuracy(
+    ground_truth: Union[np.ndarray, Tensor], prediction: Union[np.ndarray, Tensor]
+) -> float:
+    """
+
+    :param ground_truth:
+    :param prediction:
+    :return:
+    """
     prediction = get_numpy(prediction).flatten()
     ground_truth = get_numpy(ground_truth).flatten()
     prediction = to_binary(prediction)
@@ -16,7 +28,15 @@ def accuracy(ground_truth, prediction):
     return num / (den + EPSILON)
 
 
-def f1(ground_truth, prediction):
+def f1(
+    ground_truth: Union[np.ndarray, Tensor], prediction: Union[np.ndarray, Tensor]
+) -> float:
+    """
+
+    :param ground_truth:
+    :param prediction:
+    :return:
+    """
     prediction = get_numpy(prediction).flatten()
     ground_truth = get_numpy(ground_truth).flatten()
     prediction = to_binary(prediction)
@@ -26,7 +46,15 @@ def f1(ground_truth, prediction):
     return num / (den + EPSILON)
 
 
-def recall(ground_truth, prediction):
+def recall(
+    ground_truth: Union[np.ndarray, Tensor], prediction: Union[np.ndarray, Tensor]
+) -> float:
+    """
+
+    :param ground_truth:
+    :param prediction:
+    :return:
+    """
     prediction = get_numpy(prediction).flatten()
     ground_truth = get_numpy(ground_truth).flatten()
     prediction = to_binary(prediction)
@@ -34,7 +62,15 @@ def recall(ground_truth, prediction):
     return tp / (tp + fn + EPSILON)
 
 
-def precision(ground_truth, prediction):
+def precision(
+    ground_truth: Union[np.ndarray, Tensor], prediction: Union[np.ndarray, Tensor]
+) -> float:
+    """
+
+    :param ground_truth:
+    :param prediction:
+    :return:
+    """
     prediction = get_numpy(prediction).flatten()
     ground_truth = get_numpy(ground_truth).flatten()
     prediction = to_binary(prediction)
@@ -42,7 +78,15 @@ def precision(ground_truth, prediction):
     return tp / (tp + fp + EPSILON)
 
 
-def iou(ground_truth, prediction):
+def iou(
+    ground_truth: Union[np.ndarray, Tensor], prediction: Union[np.ndarray, Tensor]
+) -> float:
+    """
+
+    :param ground_truth:
+    :param prediction:
+    :return:
+    """
     prediction = get_numpy(prediction).flatten()
     ground_truth = get_numpy(ground_truth).flatten()
     prediction = to_binary(prediction)

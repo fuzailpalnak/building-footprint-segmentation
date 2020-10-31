@@ -1,4 +1,4 @@
-from typing import Union, List
+from typing import Union, List, Any, Tuple, Dict
 
 import torch
 
@@ -7,6 +7,11 @@ from torch import Tensor
 
 
 def get_gpu_device_ids():
+    """
+    Get list of available GPU devices
+    :return:
+    """
+
     device_id = list()
     separator = ","
     gpu_device_available = torch.cuda.device_count()
@@ -16,7 +21,7 @@ def get_gpu_device_ids():
     return device_id
 
 
-def load_parallel_model(model):
+def load_parallel_model(model) -> Union[Any, torch.nn.DataParallel]:
     """
 
     :param model:
@@ -34,7 +39,7 @@ def load_parallel_model(model):
         return model
 
 
-def adjust_model(state):
+def adjust_model(state: dict) -> dict:
     """
     # WhenEver a model is trained on multi gpu using DataParallel, module keyword is added
 
@@ -50,35 +55,22 @@ def adjust_model(state):
     return model
 
 
-def get_prediction_as_per_instance(outputs):
+def gpu_variable(
+    input_variable: Union[List[Tensor], Tuple[Tensor], Dict[Tensor], Tensor]
+) -> Union[List[Tensor], Tuple[Tensor], Dict, Tensor]:
     """
-
-    :param outputs:
+    :param input_variable:
     :return:
     """
-    if isinstance(outputs, dict):
-        assert "final_image" in outputs, "while passing image use key-final_image"
-        return outputs["final_image"]
-    elif isinstance(outputs, torch.Tensor):
-        return outputs
-    else:
-        raise NotImplementedError
+    if isinstance(input_variable, (list, tuple)):
+        return [gpu_variable(y) for y in input_variable]
 
+    if isinstance(input_variable, dict):
+        for k, v in input_variable.items():
+            input_variable[k] = gpu_variable(v)
+        return input_variable
 
-def gpu_variable(x):
-    """
-    :param x:
-    :return:
-    """
-    if isinstance(x, (list, tuple)):
-        return [gpu_variable(y) for y in x]
-
-    if isinstance(x, dict):
-        for k, v in x.items():
-            x[k] = gpu_variable(v)
-        return x
-
-    return x.cuda() if torch.cuda.is_available() else x
+    return input_variable.cuda() if torch.cuda.is_available() else input_variable
 
 
 def to_input_image_tensor(
@@ -114,19 +106,14 @@ def add_extra_dimension(
     return torch.unsqueeze(data.cuda(), dim=0)
 
 
-def convert_tensor_to_numpy(ip):
-    if ip.is_cuda:
-        return ip.data.cpu().numpy()
-    else:
-        return ip.data.numpy()
+def convert_tensor_to_numpy(input_variable: Tensor) -> np.ndarray:
+    return (
+        input_variable.data.cpu().numpy()
+        if input_variable.is_cuda
+        else input_variable.data.numpy()
+    )
 
 
-def extract_state(weight_path: str):
+def extract_state(weight_path: str) -> dict:
     state = torch.load(str(weight_path), map_location="cpu")
     return state
-
-
-def model_state(model, state_path: str):
-    model_adjusted = adjust_model(extract_state(state_path))
-    model.load_state_dict(model_adjusted)
-    return model

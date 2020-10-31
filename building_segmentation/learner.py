@@ -1,6 +1,7 @@
 import logging
 import random
 import time
+from typing import Tuple, Union
 
 import numpy as np
 import torch
@@ -141,7 +142,9 @@ class Learner:
                 print(ex)
                 exit(1)
 
-    def state_train(self, step, progress_bar):
+    def state_train(
+        self, step: int, progress_bar
+    ) -> Tuple[Union[int, float], dict, int, tqdm]:
 
         report_each = 100
         batch_loss = []
@@ -179,13 +182,13 @@ class Learner:
         return mean_loss.item(), self.metrics.compute_mean(), step, progress_bar
 
     @torch.no_grad()
-    def state_validate(self):
+    def state_validate(self) -> Tuple[np.ndarray, dict]:
         logger.debug("Validation In Progress")
         losses = []
-        ongoing_count = 1
         start = time.time()
+        for ongoing_count, val_data in enumerate(self.loader.val_loader):
+            ongoing_count += 1
 
-        for val_data in self.loader.val_loader:
             one_liner.one_line(
                 tag="Validation",
                 tag_data=f"{ongoing_count}/{len(self.loader.val_loader)} "
@@ -193,7 +196,6 @@ class Learner:
                 tag_color="cyan",
                 to_reset_data=True,
             )
-            ongoing_count += 1
             val_data = gpu_variable(val_data)
 
             prediction = self.model(val_data["images"])
@@ -206,7 +208,19 @@ class Learner:
 
         return np.mean(losses), self.metrics.compute_mean()
 
-    def collect_state(self, ongoing_epoch, end_epoch, step, bst_vld_loss, run_state):
+    def collect_state(
+        self,
+        ongoing_epoch: int,
+        end_epoch: int,
+        step: int,
+        bst_vld_loss: float,
+        run_state: str,
+    ) -> dict:
+        assert run_state in ["interruption", "complete"], (
+            "Expected state to save ['interruption', 'complete']" "got %s",
+            (run_state,),
+        )
+
         state_data = {
             "model": self.model.state_dict(),
             "optimizer": self.optimizer.state_dict()

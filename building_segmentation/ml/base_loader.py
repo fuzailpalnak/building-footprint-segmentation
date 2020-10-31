@@ -16,7 +16,11 @@ class Loader:
 
 class BaseLoader(Dataset):
     def __init__(
-        self, root_folder, image_normalization, ground_truth_normalization, mode
+        self,
+        root_folder: str,
+        image_normalization: str,
+        ground_truth_normalization: str,
+        mode: str,
     ):
         self.mode = mode
         self.root_folder = Path(root_folder)

@@ -155,6 +155,10 @@ class Callback(object):
 
 
 class TrainStateCallback(Callback):
+    """
+    Save the training state
+    """
+
     def __init__(self, log_dir):
         super().__init__(log_dir)
         state = make_directory(log_dir, "state")
@@ -184,6 +188,10 @@ class TrainStateCallback(Callback):
 
 
 class TensorBoardCallback(Callback):
+    """
+    Log tensor board events
+    """
+
     def __init__(self, log_dir):
         super().__init__(log_dir)
         self.writer = SummaryWriter(make_directory(log_dir, "events"))
@@ -303,7 +311,7 @@ class TrainChkCallback(Callback):
         )
 
 
-def get_default_callbacks(log_dir):
+def get_default_callbacks(log_dir: str):
     return [
         TrainChkCallback(log_dir),
         TimeCallback(),

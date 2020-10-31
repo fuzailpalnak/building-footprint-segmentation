@@ -10,16 +10,20 @@ from building_segmentation.ml.binary import models
 
 class BinaryFactory(Factory):
     def create_loader(
-        self, root_folder, image_normalization, ground_truth_normalization, batch_size
+        self,
+        root_folder: str,
+        image_normalization: str,
+        ground_truth_normalization: str,
+        batch_size: int,
     ):
         return BinaryLoader.get_data_loader(
             root_folder, image_normalization, ground_truth_normalization, batch_size
         )
 
-    def create_network(self, model_name, **model_param):
+    def create_network(self, model_name: str, **model_param):
         return getattr(models, model_name)(**model_param)
 
-    def create_criterion(self, criterion_name, **criterion_param):
+    def create_criterion(self, criterion_name: str, **criterion_param):
         return getattr(criterion, criterion_name)(**criterion_param)
 
     def create_metrics(self, data_metrics: List[str]) -> MetricList:

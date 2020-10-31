@@ -33,13 +33,11 @@ class IOU(BaseCriterion):
         return loss
 
     @staticmethod
-    def calculate_iou(predictions, targets):
+    def calculate_iou(prediction, ground_truth):
         eps = 1e-15
-        iou_target = targets
-        iou_output = predictions
 
-        intersection = (iou_output * iou_target).sum()
-        union = iou_output.sum() + iou_target.sum()
+        intersection = (prediction * ground_truth).sum()
+        union = prediction.sum() + ground_truth.sum()
 
         iou = torch.log((intersection + eps) / (union - intersection + eps))
         return iou
@@ -60,8 +58,8 @@ class Dice(BaseCriterion):
         return loss
 
     @staticmethod
-    def calculate_dice(predictions, targets):
-        dice = (2.0 * (predictions * targets).sum() + 1) / (
-            predictions.sum() + targets.sum() + 1
+    def calculate_dice(prediction, ground_truth):
+        dice = (2.0 * (prediction * ground_truth).sum() + 1) / (
+            prediction.sum() + ground_truth.sum() + 1
         )
         return dice
