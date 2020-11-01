@@ -1,4 +1,3 @@
-from types import SimpleNamespace
 from typing import List
 
 import torch
@@ -52,15 +51,14 @@ def init_segmentation(segmentation_type: str):
         raise NotImplementedError
 
 
-def parse_segmentation_trainer_config(config_path: str) -> SimpleNamespace:
+def read_trainer_config(config_path: str) -> dict:
     with open(config_path) as f:
         config = yaml.load(f, Loader=yaml.SafeLoader)
-    assert {"Model", "Criterion", "Loader", "Metrics", "Optimizer", "log_dir"} == set(
+    assert {"Model", "Criterion", "Loader", "Metrics", "Optimizer", "Callbacks"} == set(
         list(config.keys())
     ), (
-        "Expected config to have ['Model', 'Criterion', 'Loader', 'Metrics', 'Optimizer', 'log_dir']"
+        "Expected config to have ['Model', 'Criterion', 'Loader', 'Metrics', 'Optimizer', 'Callbacks']"
         "got %s",
         (config.keys(),),
     )
-    config = SimpleNamespace(**config)
     return config

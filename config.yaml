@@ -33,4 +33,10 @@ Optimizer:
   name: Adam
   param:
 
-log_dir: D:\Cypherics\lib_check\out_data
+Callbacks:
+  log_dir: D:\Cypherics\lib_check\out_data
+  calls:
+    - TrainChkCallback
+    - TimeCallback
+    - TensorBoardCallback
+    - TrainStateCallback

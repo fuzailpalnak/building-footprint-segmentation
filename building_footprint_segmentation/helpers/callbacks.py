@@ -266,8 +266,8 @@ class SchedulerCallback(Callback):
 
 
 class TimeCallback(Callback):
-    def __init__(self):
-        super().__init__(None)
+    def __init__(self, log_dir):
+        super().__init__(log_dir)
         self.start_time = None
 
     def on_begin(self, logs=None):
@@ -317,7 +317,16 @@ class TrainChkCallback(Callback):
 def get_default_callbacks(log_dir: str):
     return [
         TrainChkCallback(log_dir),
-        TimeCallback(),
+        TimeCallback(log_dir),
         TensorBoardCallback(log_dir),
         TrainStateCallback(log_dir),
     ]
+
+
+def get_callback(log_dir: str, callback: str) -> Callback:
+    """
+    :param log_dir:
+    :param callback:
+    :return:
+    """
+    return eval(callback)(log_dir)
