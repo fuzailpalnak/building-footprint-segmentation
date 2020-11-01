@@ -55,10 +55,14 @@ class Trainer:
             state["bst_vld_loss"],
         )
 
-    def resume(self, state: str):
+    def resume(self, state: str, new_end_epoch=None):
         step, start_epoch, end_epoch, bst_vld_loss = self.previous_state(
             extract_state(state)
         )
+        if new_end_epoch is not None:
+            logger.debug(f"Overriding end epoch from {end_epoch} to {new_end_epoch}")
+            end_epoch = new_end_epoch
+
         logger.debug(
             f"Resuming State {state}, with, step: {step}, start_epoch: {start_epoch}"
         )
@@ -167,10 +171,17 @@ class Trainer:
                 raise KeyboardInterrupt
             except Exception as ex:
                 progress_bar.close()
+                one_liner.one_line(
+                    tag="Exception",
+                    tag_data=str(ex),
+                    tag_color="cyan",
+                    to_reset_data=True,
+                    to_new_line_data=True,
+                )
                 raise ex
 
         one_liner.one_line(
-            tag="Training Complete", tag_color="cyan", to_reset_data=True
+            tag="Training Complete", tag_color="cyan", to_reset_data=True, to_new_line_data=True
         )
         self.callbacks.on_end()
 
