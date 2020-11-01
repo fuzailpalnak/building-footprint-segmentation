@@ -14,10 +14,7 @@ from building_footprint_segmentation.utils.operations import (
     compute_eta,
     dict_to_string,
 )
-from building_footprint_segmentation.utils.py_network import (
-    gpu_variable,
-    extract_state,
-)
+from building_footprint_segmentation.utils.py_network import gpu_variable, extract_state
 
 logger = logging.getLogger("segmentation")
 
@@ -62,7 +59,9 @@ class Trainer:
         step, start_epoch, end_epoch, bst_vld_loss = self.previous_state(
             extract_state(state)
         )
-        logger.debug(f"Resuming State {state}, with, step: {step}, start_epoch: {start_epoch}")
+        logger.debug(
+            f"Resuming State {state}, with, step: {step}, start_epoch: {start_epoch}"
+        )
         self.train(start_epoch, end_epoch, step, bst_vld_loss)
 
     def train(self, start_epoch, end_epoch, step: int = 0, bst_vld_loss: float = None):
@@ -171,9 +170,7 @@ class Trainer:
                 raise ex
 
         one_liner.one_line(
-            tag="Training Complete",
-            tag_color="cyan",
-            to_reset_data=True,
+            tag="Training Complete", tag_color="cyan", to_reset_data=True
         )
         self.callbacks.on_end()
 

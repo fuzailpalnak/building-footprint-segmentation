@@ -8,7 +8,10 @@ import time
 from py_oneliner import one_liner
 
 from building_footprint_segmentation.utils import date_time
-from building_footprint_segmentation.utils.operations import is_overridden_func, make_directory
+from building_footprint_segmentation.utils.operations import (
+    is_overridden_func,
+    make_directory,
+)
 from building_footprint_segmentation.utils.py_network import adjust_model
 
 with warnings.catch_warnings():
@@ -263,8 +266,8 @@ class SchedulerCallback(Callback):
 
 
 class TimeCallback(Callback):
-    def __init__(self):
-        super().__init__(None)
+    def __init__(self, log_dir):
+        super().__init__(log_dir)
         self.start_time = None
 
     def on_begin(self, logs=None):
@@ -311,10 +314,19 @@ class TrainChkCallback(Callback):
         )
 
 
-def get_default_callbacks(log_dir: str):
+def load_default_callbacks(log_dir: str):
     return [
         TrainChkCallback(log_dir),
-        TimeCallback(),
+        TimeCallback(log_dir),
         TensorBoardCallback(log_dir),
         TrainStateCallback(log_dir),
     ]
+
+
+def load_callback(log_dir: str, callback: str) -> Callback:
+    """
+    :param log_dir:
+    :param callback:
+    :return:
+    """
+    return eval(callback)(log_dir)
