@@ -281,7 +281,7 @@ class TimeCallback(Callback):
             tag_data=f"{total_time}",
             tag_color="cyan",
             to_reset_data=True,
-            to_new_line_data=True
+            to_new_line_data=True,
         )
 
     def interruption(self, logs=None):
@@ -292,7 +292,7 @@ class TimeCallback(Callback):
             tag_data=f"{total_time}",
             tag_color="cyan",
             to_reset_data=True,
-            to_new_line_data=True
+            to_new_line_data=True,
         )
 
 
@@ -314,6 +314,30 @@ class TrainChkCallback(Callback):
         logger.debug(
             "Successful on interruption {}, Chk Saved".format(self.__class__.__name__)
         )
+
+
+class TestDuringTrainingCallback(Callback):
+    def __init__(self, log_dir):
+        super().__init__(log_dir)
+        self.test_path = make_directory(log_dir, "test_on_epoch_end")
+
+    def on_epoch_end(self, epoch, logs=None):
+        model = logs["model"]
+        test_loader = logs["test_loader"]
+        model.eval()
+        try:
+            for i, (images, file_path) in enumerate(test_loader):
+                self.inference(model, images, file_path, self.test_path, epoch)
+                break
+        except Exception as ex:
+            logger.exception(
+                "Skipped Exception in {}".format(self.__class__.__name__)
+            )
+            logger.exception("Exception {}".format(ex))
+            pass
+
+    def inference(self, model, image, file_name, save_path, index):
+        pass
 
 
 def load_default_callbacks(log_dir: str):
