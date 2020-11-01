@@ -25,11 +25,11 @@ class BinaryFactory(Factory):
             batch_size,
         )
 
-    def create_network(self, name: str, **param):
-        return getattr(models, name)(**param)
+    def create_network(self, name: str, **kwargs):
+        return getattr(models, name)(**kwargs)
 
-    def create_criterion(self, name: str, **param):
-        return getattr(criterion, name)(**param)
+    def create_criterion(self, name: str, **kwargs):
+        return getattr(criterion, name)(**kwargs)
 
     def create_metrics(self, data_metrics: List[str]) -> MetricList:
         _metrics = list()

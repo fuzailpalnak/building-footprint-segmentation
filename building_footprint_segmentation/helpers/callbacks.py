@@ -314,7 +314,7 @@ class TrainChkCallback(Callback):
         )
 
 
-def get_default_callbacks(log_dir: str):
+def load_default_callbacks(log_dir: str):
     return [
         TrainChkCallback(log_dir),
         TimeCallback(log_dir),
@@ -323,7 +323,7 @@ def get_default_callbacks(log_dir: str):
     ]
 
 
-def get_callback(log_dir: str, callback: str) -> Callback:
+def load_callback(log_dir: str, callback: str) -> Callback:
     """
     :param log_dir:
     :param callback:

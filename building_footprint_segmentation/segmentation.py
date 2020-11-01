@@ -10,11 +10,11 @@ class Segmentation:
     def __init__(self, segmentation):
         self.segmentation = segmentation
 
-    def load_model(self, name: str, **param):
-        return load_parallel_model(self.segmentation.create_network(name, **param))
+    def load_model(self, name: str, **kwargs):
+        return load_parallel_model(self.segmentation.create_network(name, **kwargs))
 
-    def load_criterion(self, name: str, **param):
-        return self.segmentation.create_criterion(name, **param)
+    def load_criterion(self, name: str, **kwargs):
+        return self.segmentation.create_criterion(name, **kwargs)
 
     def load_loader(
         self,
@@ -36,9 +36,9 @@ class Segmentation:
         return self.segmentation.create_metrics(data_metrics)
 
     @staticmethod
-    def load_optimizer(model, name: str, **param):
+    def load_optimizer(model, name: str, **kwargs):
         return getattr(torch.optim, name)(
-            filter(lambda p: p.requires_grad, model.parameters()), **param
+            filter(lambda p: p.requires_grad, model.parameters()), **kwargs
         )
 
 
@@ -54,10 +54,16 @@ def init_segmentation(segmentation_type: str):
 def read_trainer_config(config_path: str) -> dict:
     with open(config_path) as f:
         config = yaml.load(f, Loader=yaml.SafeLoader)
-    assert {"Model", "Criterion", "Loader", "Metrics", "Optimizer", "Callbacks"} == set(
-        list(config.keys())
-    ), (
-        "Expected config to have ['Model', 'Criterion', 'Loader', 'Metrics', 'Optimizer', 'Callbacks']"
+    assert {
+        "Segmentation",
+        "Model",
+        "Criterion",
+        "Loader",
+        "Metrics",
+        "Optimizer",
+        "Callbacks",
+    } == set(list(config.keys())), (
+        "Expected config to have ['Segmentation', 'Model', 'Criterion', 'Loader', 'Metrics', 'Optimizer', 'Callbacks']"
         "got %s",
         (config.keys(),),
     )

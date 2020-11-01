@@ -15,10 +15,10 @@ class Factory:
     ):
         raise NotImplementedError
 
-    def create_network(self, name, **param):
+    def create_network(self, name, **kwargs):
         raise NotImplementedError
 
-    def create_criterion(self, name, **param):
+    def create_criterion(self, name, **kwargs):
         raise NotImplementedError
 
     def create_metrics(self, data_metrics: List[str]):
