@@ -281,6 +281,7 @@ class TimeCallback(Callback):
             tag_data=f"{total_time}",
             tag_color="cyan",
             to_reset_data=True,
+            to_new_line_data=True
         )
 
     def interruption(self, logs=None):
@@ -291,6 +292,7 @@ class TimeCallback(Callback):
             tag_data=f"{total_time}",
             tag_color="cyan",
             to_reset_data=True,
+            to_new_line_data=True
         )
 
 
