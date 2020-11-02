@@ -88,36 +88,38 @@ def get_details(fn):
 
 
 def crop_image(
-    img: np.ndarray, model_input_dimension: tuple, random_crop_coord: tuple
+    input_image: np.ndarray, crop_to_dimension: tuple, random_coord: tuple
 ) -> np.ndarray:
     """
 
-    :param img:
-    :param model_input_dimension:
-    :param random_crop_coord:
+    :param input_image:
+    :param crop_to_dimension:
+    :param random_coord:
     :return:
     """
-    model_height, model_width = model_input_dimension
-    height, width = random_crop_coord
+    model_height, model_width = crop_to_dimension
+    height, width = random_coord
 
-    img = img[height : height + model_height, width : width + model_width]
+    input_image = input_image[
+        height : height + model_height, width : width + model_width
+    ]
 
-    return img
+    return input_image
 
 
 def get_random_crop_x_and_y(
-    model_input_dimension: tuple, image_input_dimension: tuple
+    crop_to_dimension: tuple, base_dimension: tuple
 ) -> Tuple[int, int]:
     """
 
-    :param model_input_dimension:
-    :param image_input_dimension:
+    :param crop_to_dimension:
+    :param base_dimension:
     :return:
     """
-    model_height, model_width = model_input_dimension
-    image_height, image_width, _ = image_input_dimension
-    h_start = np.random.randint(0, image_height - model_height)
-    w_start = np.random.randint(0, image_width - model_height)
+    crop_height, crop_width = crop_to_dimension
+    base_height, base_width = base_dimension
+    h_start = np.random.randint(0, base_height - crop_height)
+    w_start = np.random.randint(0, base_width - crop_height)
 
     return h_start, w_start
 
@@ -208,3 +210,32 @@ def compute_eta(start, current_iter, total_iter):
     e = time.time() - start
     eta = e * total_iter / current_iter - e
     return get_time(eta)
+
+
+def handle_image_size(input_image: np.ndarray, dimension: tuple):
+    """
+
+    :param input_image:
+    :param dimension:
+    :return:
+    """
+    assert input_image.ndim == 3, (
+        "Image should have 3 dimension '[HxWxC]'" "got %s",
+        (input_image.shape,),
+    )
+    assert len(dimension) == 2, (
+        "'dimension' should have 'Hxw' " "got %s",
+        (dimension,),
+    )
+
+    h, w, _ = input_image.shape
+
+    if dimension < (input_image.shape[0], input_image.shape[1]):
+        height, width = get_random_crop_x_and_y(dimension, (h, w))
+        input_image = crop_image(input_image, dimension, (height, width))
+
+    elif dimension > (input_image.shape[0], input_image.shape[1]):
+        limit = get_pad_limit(dimension, (h, w))
+        input_image = pad_image(input_image, limit)
+
+    return input_image

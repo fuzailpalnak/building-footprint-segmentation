@@ -103,7 +103,7 @@ def add_extra_dimension(
 ) -> Union[List[Tensor], Tensor]:
     if isinstance(data, (list, tuple)):
         return [torch.unsqueeze(y.cuda(), dim=0) for y in data]
-    return torch.unsqueeze(data.cuda(), dim=0)
+    return torch.unsqueeze(data, dim=0)
 
 
 def convert_tensor_to_numpy(input_variable: Tensor) -> np.ndarray:
