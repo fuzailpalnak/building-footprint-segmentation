@@ -5,5 +5,5 @@ opencv_python_headless == 4.4.0.44
 py_oneliner == 0.0.1
 scikit_learn == 0.23.2
 torch
-torchvision == 0.8.1
+torchvision
 tqdm == 4.51.0
