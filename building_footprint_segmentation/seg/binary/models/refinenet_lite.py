@@ -123,8 +123,8 @@ class LightWeightRefineBlock(nn.Module):
 class ReFineNetLite(nn.Module):
     def __init__(
         self,
-        res_net_to_use,
-        pre_trained_image_net,
+        res_net_to_use="resnet34",
+        pre_trained_image_net=True,
         top_layers_trainable=True,
         num_classes=1,
     ):
