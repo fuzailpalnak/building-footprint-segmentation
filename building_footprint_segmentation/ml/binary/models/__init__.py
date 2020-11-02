@@ -1,3 +1,0 @@
-from building_footprint_segmentation.ml.binary.models.refinenet import ReFineNet
-from building_footprint_segmentation.ml.binary.models.mfrn import MFRN
-from building_footprint_segmentation.ml.binary.models.refinenet_lite import ReFineNetLite
