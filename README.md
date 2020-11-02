@@ -1,9 +1,16 @@
 # Building Footprint Segmentation
+![Python](https://img.shields.io/badge/python-v3.6+-blue.svg)
+![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)
+![Licence](https://img.shields.io/github/license/fuzailpalnak/building-footprint-segmentation)
+![merge1](https://user-images.githubusercontent.com/24665570/97859410-91fa6100-1d26-11eb-8a47-e41982c748d7.jpg)
+
 #### Library to train building footprint on satellite and aerial imagery.
 
 
 ## Installation
-
+    
+    pip install git+https://github.com/fuzailpalnak/building-footprint-segmentation.git#egg=building-footprint-segmentation
+    
 
 ## Dataset 
 
