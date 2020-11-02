@@ -181,7 +181,10 @@ class Trainer:
                 raise ex
 
         one_liner.one_line(
-            tag="Training Complete", tag_color="cyan", to_reset_data=True, to_new_line_data=True
+            tag="Training Complete",
+            tag_color="cyan",
+            to_reset_data=True,
+            to_new_line_data=True,
         )
         self.callbacks.on_end()
 
