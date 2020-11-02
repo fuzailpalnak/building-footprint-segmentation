@@ -330,9 +330,7 @@ class TestDuringTrainingCallback(Callback):
                 self.inference(model, images, file_path, self.test_path, epoch)
                 break
         except Exception as ex:
-            logger.exception(
-                "Skipped Exception in {}".format(self.__class__.__name__)
-            )
+            logger.exception("Skipped Exception in {}".format(self.__class__.__name__))
             logger.exception("Exception {}".format(ex))
             pass
 
