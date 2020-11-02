@@ -166,8 +166,8 @@ class RefineBlock(nn.Module):
 class ReFineNet(nn.Module):
     def __init__(
         self,
-        res_net_to_use,
-        pre_trained_image_net,
+        res_net_to_use="resnet34",
+        pre_trained_image_net=True,
         top_layers_trainable=True,
         num_classes=1,
     ):
@@ -236,7 +236,7 @@ class ReFineNet(nn.Module):
             in_planes=256, out_planes=256
         )
 
-        self.final_layer = convolution_3x3(in_planes=256, out_planes=self.num_classes)
+        self.final_layer = convolution_1x1(in_planes=256, out_planes=self.num_classes)
 
     def forward(self, input_feature: Tensor) -> Tensor:
 
