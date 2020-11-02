@@ -1,0 +1,9 @@
+PyYAML == 5.3.1
+albumentations == 0.5.0
+numpy == 1.19.2
+opencv_python_headless == 4.4.0.44
+py_oneliner == 0.0.1
+scikit_learn == 0.23.2
+torch == 1.7.0
+torchvision == 0.8.1
+tqdm == 4.51.0
