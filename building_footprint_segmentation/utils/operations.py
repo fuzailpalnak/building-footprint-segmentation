@@ -230,11 +230,11 @@ def handle_image_size(input_image: np.ndarray, dimension: tuple):
 
     h, w, _ = input_image.shape
 
-    if dimension < (input_image.shape[0], input_image.shape[1]):
-        height, width = get_random_crop_x_and_y(dimension, (h, w))
-        input_image = crop_image(input_image, dimension, (height, width))
+    if dimension < (h, w):
+        random_height, random_width = get_random_crop_x_and_y(dimension, (h, w))
+        input_image = crop_image(input_image, dimension, (random_height, random_width))
 
-    elif dimension > (input_image.shape[0], input_image.shape[1]):
+    elif dimension > (h, w):
         limit = get_pad_limit(dimension, (h, w))
         input_image = pad_image(input_image, limit)
 
