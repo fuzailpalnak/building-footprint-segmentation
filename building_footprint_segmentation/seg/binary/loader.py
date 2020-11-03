@@ -1,3 +1,5 @@
+import os
+
 from albumentations import from_dict
 from building_footprint_segmentation.helpers import normalizer
 
@@ -28,7 +30,7 @@ class BinaryLoader(BaseLoader):
             normalizer, self.ground_truth_normalization
         )
 
-        if mode is "train":
+        if mode is "train" and len(self.augmenters) > 0:
             self.augmenters = from_dict(self.augmenters)
 
     def __len__(self):
@@ -59,7 +61,7 @@ class BinaryLoader(BaseLoader):
             image = load_image(str(self.images[idx]))
             return {
                 "images": to_input_image_tensor(image),
-                "file_name": str(self.images[idx]),
+                "file_name": os.path.basename(str(self.images[idx])),
             }
         else:
             raise NotImplementedError

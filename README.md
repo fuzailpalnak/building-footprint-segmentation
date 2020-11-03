@@ -30,7 +30,7 @@
 
 ## Visualize Training
 
-##### Test images at end of every epoch
+##### Test images at end of every epoch. Follow [Example](https://github.com/fuzailpalnak/building-footprint-segmentation/blob/main/examples/TestCallBack.ipynb)
 
 ```python
 from building_footprint_segmentation.helpers.callbacks import CallbackList, TestDuringTrainingCallback
