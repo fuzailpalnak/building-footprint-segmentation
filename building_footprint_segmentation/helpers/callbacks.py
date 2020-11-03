@@ -12,7 +12,7 @@ from building_footprint_segmentation.utils.operations import (
     is_overridden_func,
     make_directory,
 )
-from building_footprint_segmentation.utils.py_network import adjust_model
+from building_footprint_segmentation.utils.py_network import adjust_model, gpu_variable
 
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore")
@@ -326,8 +326,14 @@ class TestDuringTrainingCallback(Callback):
         test_loader = logs["test_loader"]
         model.eval()
         try:
-            for i, (images, file_path) in enumerate(test_loader):
-                self.inference(model, images, file_path, self.test_path, epoch)
+            for i, test_data in enumerate(test_loader):
+                self.inference(
+                    model,
+                    gpu_variable(test_data["images"]),
+                    test_data["file_name"],
+                    self.test_path,
+                    epoch,
+                )
                 break
         except Exception as ex:
             logger.exception("Skipped Exception in {}".format(self.__class__.__name__))
