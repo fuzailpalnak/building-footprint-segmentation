@@ -30,7 +30,7 @@
 
 ## Visualize Training
 
-##### Test images at end of every epoch, extend the `TestDuringTrainingCallback`
+##### Test images at end of every epoch
 
 ```python
 from building_footprint_segmentation.helpers.callbacks import CallbackList, TestDuringTrainingCallback
