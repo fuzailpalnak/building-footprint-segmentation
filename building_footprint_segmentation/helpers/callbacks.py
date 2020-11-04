@@ -1,6 +1,6 @@
 import logging
 import os
-
+import cv2
 import torch
 import warnings
 import time
@@ -12,7 +12,11 @@ from building_footprint_segmentation.utils.operations import (
     is_overridden_func,
     make_directory,
 )
-from building_footprint_segmentation.utils.py_network import adjust_model, gpu_variable
+from building_footprint_segmentation.utils.py_network import (
+    adjust_model,
+    gpu_variable,
+    convert_tensor_to_numpy,
+)
 
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore")
@@ -342,6 +346,28 @@ class TestDuringTrainingCallback(Callback):
 
     def inference(self, model, image, file_name, save_path, index):
         pass
+
+
+class BinaryTestCallback(TestDuringTrainingCallback):
+    def inference(self, model, image, file_name, save_path, index):
+        """
+
+        :param model: the model used for training
+        :param image: the images loaded by the test loader
+        :param file_name: the file name of the test image
+        :param save_path: path where to save the image
+        :param index:
+        :return:
+        """
+        prediction = model(image)
+        prediction = prediction.sigmoid()
+        batch, _, h, w = prediction.shape
+        for i in range(batch):
+            prediction_numpy = convert_tensor_to_numpy(prediction[i])
+            prediction_numpy = prediction_numpy.reshape((h, w))
+            cv2.imwrite(
+                os.path.join(save_path, f"{file_name[i]}.png"), prediction_numpy * 255
+            )
 
 
 def load_default_callbacks(log_dir: str):
