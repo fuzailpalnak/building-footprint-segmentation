@@ -30,31 +30,10 @@
 
 ## Visualize Training
 
-##### Test images at end of every epoch. Follow [Example](https://github.com/fuzailpalnak/building-footprint-segmentation/blob/main/examples/TestCallBack.ipynb)
+##### Test images at end of every epoch
 
-```python
-from building_footprint_segmentation.helpers.callbacks import CallbackList, TestDuringTrainingCallback
-
-class TestCallback(TestDuringTrainingCallback):
-    def inference(self, model, image, file_name, save_path, index):
-        """
-        
-        :param model: the model used for training
-        :param image: the images loaded by the test loader
-        :param file_name: the file name of the test image
-        :param save_path: path where to save the image
-        :param index: 
-        :return: 
-        """
-        # Define this method on how to handle the prediction at the end of every epoch
-
-where_to_log_the_callback = r"path_to_log_callback"   
-callbacks = CallbackList()
-
-# Ouptut from all the callbacks caller will be stored at the path specified in log_dir
-callbacks.append(TestCallback(where_to_log_the_callback))
-```
-
+- Follow [Example](https://github.com/fuzailpalnak/building-footprint-segmentation/blob/main/examples/TestCallBack.ipynb)
+ 
 ##### Visualizing on Tensorboard
 
 ```python
@@ -71,7 +50,21 @@ To view Tensorboard dash board
 
     tensorboard --logdir="path_to_log_callback"
 
+## Defining Custom Callback
+```python
+from building_footprint_segmentation.helpers.callbacks import CallbackList, Callback
 
+class CustomCallback(Callback):
+    def __init__(self, log_dir):
+        super().__init__(log_dir)
+
+
+where_to_log_the_callback = r"path_to_log_callback"   
+callbacks = CallbackList()
+
+# Ouptut from all the callbacks caller will be stored at the path specified in log_dir
+callbacks.append(CustomCallback(where_to_log_the_callback))
+```
 
 ## Segmentation for building footprint
 
