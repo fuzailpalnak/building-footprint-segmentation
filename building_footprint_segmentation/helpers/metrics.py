@@ -29,8 +29,8 @@ class MetricList:
 
     def get_metrics(
         self,
-        ground_truth: Union[np.ndarray, Tensor],
-        prediction: Union[np.ndarray, Tensor],
+        ground_truth: Tensor,
+        prediction: Tensor,
     ):
         """
 
@@ -44,8 +44,8 @@ class MetricList:
 
     def compute_metric(
         self,
-        ground_truth: Union[np.ndarray, Tensor],
-        prediction: Union[np.ndarray, Tensor],
+        ground_truth: Tensor,
+        prediction: Tensor,
     ) -> dict:
         """
 
