@@ -1,11 +1,9 @@
 import numpy as np
 from typing import Union
 
-from sklearn.metrics import confusion_matrix
 from torch import Tensor
 
-from building_footprint_segmentation.utils.operations import get_numpy, to_binary
-
+from building_footprint_segmentation.helpers.metrics import confusion_matrix
 
 EPSILON = 1e-11
 
@@ -19,10 +17,7 @@ def accuracy(
     :param prediction:
     :return:
     """
-    prediction = get_numpy(prediction).flatten()
-    ground_truth = get_numpy(ground_truth).flatten()
-    prediction = to_binary(prediction)
-    tn, fp, fn, tp = confusion_matrix(ground_truth, prediction, labels=[0, 1]).ravel()
+    tn, fp, fn, tp = confusion_matrix(prediction, ground_truth)
     num = tp + tn
     den = tp + tn + fp + fn
     return num / (den + EPSILON)
@@ -37,13 +32,9 @@ def f1(
     :param prediction:
     :return:
     """
-    prediction = get_numpy(prediction).flatten()
-    ground_truth = get_numpy(ground_truth).flatten()
-    prediction = to_binary(prediction)
-    tn, fp, fn, tp = confusion_matrix(ground_truth, prediction, labels=[0, 1]).ravel()
-    num = 2 * tp
-    den = (2 * tp) + fp + fn
-    return num / (den + EPSILON)
+
+    _, fp, fn, tp = confusion_matrix(prediction, ground_truth)
+    return (2 * tp) / (((2 * tp) + fp + fn) + EPSILON)
 
 
 def recall(
@@ -55,10 +46,7 @@ def recall(
     :param prediction:
     :return:
     """
-    prediction = get_numpy(prediction).flatten()
-    ground_truth = get_numpy(ground_truth).flatten()
-    prediction = to_binary(prediction)
-    tn, fp, fn, tp = confusion_matrix(ground_truth, prediction, labels=[0, 1]).ravel()
+    _, _, fn, tp = confusion_matrix(prediction, ground_truth)
     return tp / (tp + fn + EPSILON)
 
 
@@ -71,10 +59,7 @@ def precision(
     :param prediction:
     :return:
     """
-    prediction = get_numpy(prediction).flatten()
-    ground_truth = get_numpy(ground_truth).flatten()
-    prediction = to_binary(prediction)
-    tn, fp, fn, tp = confusion_matrix(ground_truth, prediction, labels=[0, 1]).ravel()
+    _, fp, _, tp = confusion_matrix(prediction, ground_truth)
     return tp / (tp + fp + EPSILON)
 
 
@@ -87,10 +72,7 @@ def iou(
     :param prediction:
     :return:
     """
-    prediction = get_numpy(prediction).flatten()
-    ground_truth = get_numpy(ground_truth).flatten()
-    prediction = to_binary(prediction)
-    tn, fp, fn, tp = confusion_matrix(ground_truth, prediction, labels=[0, 1]).ravel()
+    _, fp, fn, tp = confusion_matrix(prediction, ground_truth)
     denominator = tp + fp + fn
     if denominator == 0:
         value = 0

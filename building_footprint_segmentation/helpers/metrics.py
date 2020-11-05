@@ -1,7 +1,8 @@
 import logging
-from typing import Union
+from typing import Union, Tuple
 
 import numpy as np
+import torch
 from torch import Tensor
 
 from building_footprint_segmentation.utils.operations import handle_dictionary
@@ -72,3 +73,60 @@ class MetricList:
             mean_metric = handle_dictionary(mean_metric, key, mean_value)
         self.metric_value = dict()
         return mean_metric
+
+
+def true_positive(prediction: Tensor, ground_truth: Tensor) -> float:
+    """
+
+    :param prediction: [batch_size, channels, img_rows, img_cols]
+    :param ground_truth: [batch_size, channels, img_rows, img_cols]
+    :return:
+    """
+    return torch.sum(ground_truth * prediction).item()
+
+
+def false_positive(prediction: Tensor, ground_truth: Tensor) -> float:
+    """
+
+    :param prediction: [batch_size, channels, img_rows, img_cols]
+    :param ground_truth: [batch_size, channels, img_rows, img_cols]
+    :return:
+    """
+    return torch.sum((1.0 - ground_truth) * prediction).item()
+
+
+def true_negative(prediction: Tensor, ground_truth: Tensor) -> float:
+    """
+
+    :param prediction: [batch_size, channels, img_rows, img_cols]
+    :param ground_truth: [batch_size, channels, img_rows, img_cols]
+    :return:
+    """
+    return torch.sum((1.0 - ground_truth) * (1.0 - prediction)).item()
+
+
+def false_negative(prediction: Tensor, ground_truth: Tensor) -> float:
+    """
+
+    :param prediction: [batch_size, channels, img_rows, img_cols]
+    :param ground_truth: [batch_size, channels, img_rows, img_cols]
+    :return:
+    """
+    return torch.sum(ground_truth * (1.0 - prediction)).item()
+
+
+def confusion_matrix(
+    prediction: Tensor, ground_truth: Tensor
+) -> Tuple[float, float, float, float]:
+    """
+
+    :param prediction: [batch_size, channels, img_rows, img_cols]
+    :param ground_truth: [batch_size, channels, img_rows, img_cols]
+    :return: true negative, false positive, false negative, true positive
+    """
+    return (
+        true_negative(prediction, ground_truth),
+        false_positive(prediction, ground_truth),
+        false_negative(prediction, ground_truth),
+        true_positive(prediction, ground_truth),
+    )

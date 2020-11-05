@@ -45,6 +45,7 @@ class Segmentation:
 def init_segmentation(segmentation_type: str):
     if segmentation_type == "binary":
         from building_footprint_segmentation.seg.binary.factory import BinaryFactory
+
         return Segmentation(BinaryFactory())
     else:
         raise NotImplementedError
