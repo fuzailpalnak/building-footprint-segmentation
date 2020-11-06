@@ -349,6 +349,7 @@ class TestDuringTrainingCallback(Callback):
 
 
 class BinaryTestCallback(TestDuringTrainingCallback):
+    @torch.no_grad()
     def inference(self, model, image, file_name, save_path, index):
         """
 
