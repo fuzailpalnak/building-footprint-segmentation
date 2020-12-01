@@ -5,6 +5,7 @@
 ![Python](https://img.shields.io/badge/python-v3.6+-blue.svg)
 ![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)
 ![Licence](https://img.shields.io/github/license/fuzailpalnak/building-footprint-segmentation)
+![Downloads](https://pepy.tech/badge/building-footprint-segmentation)
 
 ![merge1](https://user-images.githubusercontent.com/24665570/97859410-91fa6100-1d26-11eb-8a47-e41982c748d7.jpg)
 
