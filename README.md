@@ -7,6 +7,9 @@
 ![Licence](https://img.shields.io/github/license/fuzailpalnak/building-footprint-segmentation)
 ![Downloads](https://pepy.tech/badge/building-footprint-segmentation)
 
+
+<a href='https://ko-fi.com/fuzailpalnak' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://az743702.vo.msecnd.net/cdn/kofi1.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
 ![merge1](https://user-images.githubusercontent.com/24665570/97859410-91fa6100-1d26-11eb-8a47-e41982c748d7.jpg)
 
 
