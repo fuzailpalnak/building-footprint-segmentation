@@ -1,6 +1,6 @@
 from typing import List
 
-from building_footprint_segmentation.helpers.metrics import MetricList
+from building_footprint_segmentation.helpers.metrics import BinaryMetric
 from building_footprint_segmentation.seg.base_factory import Factory
 from building_footprint_segmentation.seg.binary.loader import BinaryLoader
 from building_footprint_segmentation.seg.binary import metrics
@@ -31,9 +31,9 @@ class BinaryFactory(Factory):
     def create_criterion(self, name: str, **kwargs):
         return getattr(criterion, name)(**kwargs)
 
-    def create_metrics(self, data_metrics: List[str]) -> MetricList:
+    def create_metrics(self, data_metrics: List[str]) -> BinaryMetric:
         _metrics = list()
         for metric in data_metrics:
             if hasattr(metrics, metric):
                 _metrics.append(getattr(metrics, metric))
-        return MetricList(_metrics)
+        return BinaryMetric(_metrics)

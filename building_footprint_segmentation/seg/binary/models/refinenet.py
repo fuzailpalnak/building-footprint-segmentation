@@ -15,13 +15,23 @@ refine_block_features - represent the output of Refine Block
 
 def convolution_3x3(in_planes, out_planes, stride=1, padding=1, bias=True):
     return nn.Conv2d(
-        in_planes, out_planes, kernel_size=3, stride=stride, padding=padding, bias=bias
+        in_planes,
+        out_planes,
+        kernel_size=(3, 3),
+        stride=(stride, stride),
+        padding=padding,
+        bias=bias,
     )
 
 
 def convolution_1x1(in_planes, out_planes, stride=1, padding=0, bias=True):
     return nn.Conv2d(
-        in_planes, out_planes, kernel_size=1, stride=stride, padding=padding, bias=bias
+        in_planes,
+        out_planes,
+        kernel_size=(1, 1),
+        stride=(stride, stride),
+        padding=padding,
+        bias=bias,
     )
 
 
