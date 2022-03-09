@@ -1,10 +1,9 @@
 import logging
-from typing import Union, Tuple
+from typing import Tuple
 
 import numpy as np
 import torch
 from torch import Tensor
-from torch.nn import functional
 from building_footprint_segmentation.utils.operations import handle_dictionary
 
 EPSILON = 1e-11
@@ -13,7 +12,7 @@ logger = logging.getLogger("segmentation")
 
 
 class MetricList:
-    def __init__(self, metrics: list, activation: str = "sigmoid"):
+    def __init__(self, metrics: list):
         metrics = metrics or []
         self.metrics = [c for c in metrics]
         if len(metrics) != 0:
@@ -22,11 +21,13 @@ class MetricList:
                 for c in metrics
             ]
         self.metric_value = dict()
-        self._activation = activation
 
     def append(self, callback):
         logger.debug("Registered {}".format(callback.__class__.__name__))
         self.metrics.append(callback)
+
+    def metric_activation(self, prediction):
+        raise NotImplementedError
 
     def get_metrics(
         self,
@@ -39,8 +40,7 @@ class MetricList:
         :param prediction:
         :return:
         """
-        if self._activation == "sigmoid":
-            prediction = prediction.sigmoid()
+        prediction = self.metric_activation(prediction)
 
         computed_metric = self.compute_metric(ground_truth, prediction)
         for key, value in computed_metric.items():
@@ -77,6 +77,15 @@ class MetricList:
             mean_metric = handle_dictionary(mean_metric, key, mean_value)
         self.metric_value = dict()
         return mean_metric
+
+
+class BinaryMetric(MetricList):
+    def __init__(self, metrics: list):
+        super().__init__(metrics)
+        self._activation = "sigmoid"
+
+    def metric_activation(self, prediction):
+        return prediction.sigmoid()
 
 
 def true_positive(prediction: Tensor, ground_truth: Tensor) -> float:
