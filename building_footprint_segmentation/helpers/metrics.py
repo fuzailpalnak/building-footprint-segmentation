@@ -82,7 +82,7 @@ def true_positive(prediction: Tensor, ground_truth: Tensor) -> float:
     :param ground_truth: [batch_size, channels, img_rows, img_cols]
     :return:
     """
-    return torch.sum(ground_truth * prediction).item()
+    return torch.sum((ground_truth * prediction) > 0).item()
 
 
 def false_positive(prediction: Tensor, ground_truth: Tensor) -> float:
@@ -92,7 +92,7 @@ def false_positive(prediction: Tensor, ground_truth: Tensor) -> float:
     :param ground_truth: [batch_size, channels, img_rows, img_cols]
     :return:
     """
-    return torch.sum((1.0 - ground_truth) * prediction).item()
+    return torch.sum(((1.0 - ground_truth) * prediction) > 0).item()
 
 
 def true_negative(prediction: Tensor, ground_truth: Tensor) -> float:
@@ -102,7 +102,7 @@ def true_negative(prediction: Tensor, ground_truth: Tensor) -> float:
     :param ground_truth: [batch_size, channels, img_rows, img_cols]
     :return:
     """
-    return torch.sum((1.0 - ground_truth) * (1.0 - prediction)).item()
+    return torch.sum(((1.0 - ground_truth) * (1.0 - prediction)) > 0).item()
 
 
 def false_negative(prediction: Tensor, ground_truth: Tensor) -> float:
@@ -112,7 +112,7 @@ def false_negative(prediction: Tensor, ground_truth: Tensor) -> float:
     :param ground_truth: [batch_size, channels, img_rows, img_cols]
     :return:
     """
-    return torch.sum(ground_truth * (1.0 - prediction)).item()
+    return torch.sum((ground_truth * (1.0 - prediction)) > 0).item()
 
 
 def confusion_matrix(
