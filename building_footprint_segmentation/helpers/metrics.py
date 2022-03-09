@@ -4,7 +4,7 @@ from typing import Union, Tuple
 import numpy as np
 import torch
 from torch import Tensor
-
+from torch.nn import functional
 from building_footprint_segmentation.utils.operations import handle_dictionary
 
 EPSILON = 1e-11
@@ -13,7 +13,7 @@ logger = logging.getLogger("segmentation")
 
 
 class MetricList:
-    def __init__(self, metrics: list):
+    def __init__(self, metrics: list, activation: str = "sigmoid"):
         metrics = metrics or []
         self.metrics = [c for c in metrics]
         if len(metrics) != 0:
@@ -22,6 +22,7 @@ class MetricList:
                 for c in metrics
             ]
         self.metric_value = dict()
+        self._activation = activation
 
     def append(self, callback):
         logger.debug("Registered {}".format(callback.__class__.__name__))
@@ -38,6 +39,9 @@ class MetricList:
         :param prediction:
         :return:
         """
+        if self._activation == "sigmoid":
+            prediction = prediction.sigmoid()
+
         computed_metric = self.compute_metric(ground_truth, prediction)
         for key, value in computed_metric.items():
             self.metric_value = handle_dictionary(self.metric_value, key, value)
