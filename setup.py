@@ -14,7 +14,7 @@ except FileNotFoundError:
 
 setup(
     name="building-footprint-segmentation",
-    version="0.2.2",
+    version="0.2.3",
     author="Fuzail Palnak",
     author_email="fuzailpalnak@gmail.com",
     url="https://github.com/fuzailpalnak/building-footprint-segmentation",
