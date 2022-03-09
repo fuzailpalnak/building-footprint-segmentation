@@ -132,7 +132,7 @@ def get_pad_limit(model_input_dimension: tuple, image_input_dimension: tuple) ->
     :return:
     """
     model_height, model_width = model_input_dimension
-    image_height, image_width, _ = image_input_dimension
+    image_height, image_width = image_input_dimension
 
     limit = (model_height - image_height) // 2
     return limit
