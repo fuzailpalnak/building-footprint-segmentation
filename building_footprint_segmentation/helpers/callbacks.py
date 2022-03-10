@@ -1,5 +1,7 @@
 import logging
 import os
+import shutil
+
 import cv2
 import torch
 import warnings
@@ -323,19 +325,25 @@ class TrainChkCallback(Callback):
 class TestDuringTrainingCallback(Callback):
     def __init__(self, log_dir):
         super().__init__(log_dir)
-        self.test_path = make_directory(log_dir, "test_on_epoch_end")
+        self.test_path = os.path.join(log_dir, "test_on_epoch_end")
 
     def on_epoch_end(self, epoch, logs=None):
         model = logs["model"]
         test_loader = logs["test_loader"]
         model.eval()
         try:
+            if os.path.exists(self.test_path):
+                shutil.rmtree(self.test_path)
+
             for i, test_data in enumerate(test_loader):
                 self.inference(
                     model,
                     gpu_variable(test_data["images"]),
                     test_data["file_name"],
-                    self.test_path,
+                    make_directory(
+                        os.path.dirname(self.test_path),
+                        os.path.basename(self.test_path),
+                    ),
                     epoch,
                 )
                 break
@@ -349,6 +357,10 @@ class TestDuringTrainingCallback(Callback):
 
 
 class BinaryTestCallback(TestDuringTrainingCallback):
+    def __init__(self, log_dir, threshold: float = 0.20):
+        super().__init__(log_dir)
+        self._threshold = threshold
+
     @torch.no_grad()
     def inference(self, model, image, file_name, save_path, index):
         """
@@ -362,6 +374,9 @@ class BinaryTestCallback(TestDuringTrainingCallback):
         """
         prediction = model(image)
         prediction = prediction.sigmoid()
+        prediction[prediction >= self._threshold] = 1
+        prediction[prediction < self._threshold] = 0
+
         batch, _, h, w = prediction.shape
         for i in range(batch):
             prediction_numpy = convert_tensor_to_numpy(prediction[i])
