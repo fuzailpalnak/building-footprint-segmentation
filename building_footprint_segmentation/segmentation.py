@@ -10,8 +10,11 @@ class Segmentation:
     def __init__(self, segmentation):
         self.segmentation = segmentation
 
-    def load_model(self, name: str, **kwargs):
-        return load_parallel_model(self.segmentation.create_network(name, **kwargs))
+    def load_model(self, name: str, transfer_weights: str = None, **kwargs):
+        model = self.segmentation.create_network(name, **kwargs)
+        if transfer_weights is not None:
+            model.load_state_dict(torch.load(transfer_weights))
+        return load_parallel_model(model)
 
     def load_criterion(self, name: str, **kwargs):
         return self.segmentation.create_criterion(name, **kwargs)

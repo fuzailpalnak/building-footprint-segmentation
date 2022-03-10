@@ -83,9 +83,13 @@ class BinaryMetric(MetricList):
     def __init__(self, metrics: list):
         super().__init__(metrics)
         self._activation = "sigmoid"
+        self._threshold = 0.20
 
     def metric_activation(self, prediction):
-        return prediction.sigmoid()
+        prediction.sigmoid()
+        prediction[prediction >= self._threshold] = 1
+        prediction[prediction < self._threshold] = 0
+        return prediction
 
 
 def true_positive(prediction: Tensor, ground_truth: Tensor) -> float:
@@ -95,7 +99,7 @@ def true_positive(prediction: Tensor, ground_truth: Tensor) -> float:
     :param ground_truth: [batch_size, channels, img_rows, img_cols]
     :return:
     """
-    return torch.sum((ground_truth * prediction) > 0).item()
+    return torch.sum((ground_truth * prediction) == 1).item()
 
 
 def false_positive(prediction: Tensor, ground_truth: Tensor) -> float:
@@ -105,7 +109,7 @@ def false_positive(prediction: Tensor, ground_truth: Tensor) -> float:
     :param ground_truth: [batch_size, channels, img_rows, img_cols]
     :return:
     """
-    return torch.sum(((1.0 - ground_truth) * prediction) > 0).item()
+    return torch.sum(((1.0 - ground_truth) * prediction) == 1).item()
 
 
 def true_negative(prediction: Tensor, ground_truth: Tensor) -> float:
@@ -115,7 +119,7 @@ def true_negative(prediction: Tensor, ground_truth: Tensor) -> float:
     :param ground_truth: [batch_size, channels, img_rows, img_cols]
     :return:
     """
-    return torch.sum(((1.0 - ground_truth) * (1.0 - prediction)) > 0).item()
+    return torch.sum(((1.0 - ground_truth) * (1.0 - prediction)) == 1).item()
 
 
 def false_negative(prediction: Tensor, ground_truth: Tensor) -> float:
@@ -125,7 +129,7 @@ def false_negative(prediction: Tensor, ground_truth: Tensor) -> float:
     :param ground_truth: [batch_size, channels, img_rows, img_cols]
     :return:
     """
-    return torch.sum((ground_truth * (1.0 - prediction)) > 0).item()
+    return torch.sum((ground_truth * (1.0 - prediction)) == 1).item()
 
 
 def confusion_matrix(

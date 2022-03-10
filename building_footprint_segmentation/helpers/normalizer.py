@@ -38,3 +38,10 @@ def min_max_image_net(img: np.ndarray) -> np.ndarray:
     out -= np.ones(out.shape) * (0.485, 0.456, 0.406)
     out /= np.ones(out.shape) * (0.229, 0.224, 0.225)
     return out
+
+
+def divide_255_image_net(img: np.ndarray) -> np.ndarray:
+    out = img.astype(np.float32) / 255
+    out -= np.ones(out.shape) * (0.485, 0.456, 0.406)
+    out /= np.ones(out.shape) * (0.229, 0.224, 0.225)
+    return out
