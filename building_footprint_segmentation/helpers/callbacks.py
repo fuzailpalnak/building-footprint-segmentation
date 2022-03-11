@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 import shutil
@@ -136,7 +137,9 @@ class CallbackList(object):
 
 class Callback(object):
     def __init__(self, log_dir):
-        self.log_dir = log_dir
+        self.log_dir = os.path.join(
+            log_dir, datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        )
 
     def on_epoch_begin(self, epoch, logs=None):
         pass
@@ -170,7 +173,7 @@ class TrainStateCallback(Callback):
 
     def __init__(self, log_dir):
         super().__init__(log_dir)
-        state = make_directory(log_dir, "state")
+        state = make_directory(self.log_dir, "state")
         self.chk = os.path.join(state, "default.pt")
         self.best = os.path.join(state, "best.pt")
 
@@ -203,7 +206,7 @@ class TensorBoardCallback(Callback):
 
     def __init__(self, log_dir):
         super().__init__(log_dir)
-        self.writer = SummaryWriter(make_directory(log_dir, "events"))
+        self.writer = SummaryWriter(make_directory(self.log_dir, "events"))
 
     def plt_scalar(self, y, x, tag):
         if type(y) is dict:
@@ -305,7 +308,7 @@ class TimeCallback(Callback):
 class TrainChkCallback(Callback):
     def __init__(self, log_dir):
         super().__init__(log_dir)
-        self.chk = os.path.join(make_directory(log_dir, "chk_pth"), "chk_pth.pt")
+        self.chk = os.path.join(make_directory(self.log_dir, "chk_pth"), "chk_pth.pt")
 
     def on_epoch_end(self, epoch, logs=None):
         my_state = logs["state"]
@@ -325,7 +328,7 @@ class TrainChkCallback(Callback):
 class TestDuringTrainingCallback(Callback):
     def __init__(self, log_dir):
         super().__init__(log_dir)
-        self.test_path = os.path.join(log_dir, "test_on_epoch_end")
+        self.test_path = os.path.join(self.log_dir, "test_on_epoch_end")
 
     def on_epoch_end(self, epoch, logs=None):
         model = logs["model"]
