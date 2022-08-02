@@ -11,7 +11,9 @@ __author__ = (
 class DilatedConvRelu(nn.Module):
     def __init__(self, in_: int, out: int, dilation: int):
         super().__init__()
-        self.conv = nn.Conv2d(in_, out, (3, 3), padding=dilation, dilation=(dilation, dilation))
+        self.conv = nn.Conv2d(
+            in_, out, (3, 3), padding=dilation, dilation=(dilation, dilation)
+        )
         self.activation = nn.ReLU(inplace=True)
 
     def forward(self, x):
@@ -59,7 +61,9 @@ class DecoderBlockLinkNet(nn.Module):
 
 
 class DLinkNet34(nn.Module):
-    def __init__(self, num_classes=1, res_net_to_use="resnet34", pre_trained_image_net=True):
+    def __init__(
+        self, num_classes=1, res_net_to_use="resnet34", pre_trained_image_net=True
+    ):
         super().__init__()
         self.num_classes = num_classes
         filters = [64, 128, 256, 512]
