@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "Please cite this repository If you found it helpful in your reserach."
+preferred-citation:
+  type: generic
+  authors:
+  - family-names: "Palnak"
+    given-names: "Fuzail A."
+  title: "building-footprint-segmentation"
+  url: "https://github.com/fuzailpalnak/building-footprint-segmentation"
