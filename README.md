@@ -119,3 +119,9 @@ for file in glob.glob(
 
 - [RefineNet trained on INRIA](https://github.com/fuzailpalnak/building-footprint-segmentation/releases/download/alpha/refine.zip)
 - [DlinkNet trained on Massachusetts Buildings Dataset](https://github.com/fuzailpalnak/building-footprint-segmentation/releases/download/alpha/DlinkNet.zip)
+
+## Commonly used utility task when working with Geotiff
+
+- [Generate bitmap from shape file](https://github.com/fuzailpalnak/py-gis-utility#generate-bitmap-from-shape-file)
+- [Generate shape geometry from geo reference bitmap](https://github.com/fuzailpalnak/py-gis-utility#generate-shape-geometry-from-geo-reference-bitmap)
+- [Save Multi Band Imagery](https://github.com/fuzailpalnak/py-gis-utility#save-multi-band-imagery)
