@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from typing import Union, List, Any, Tuple, Dict
 
 import torch
@@ -39,7 +40,7 @@ def load_parallel_model(model) -> Union[Any, torch.nn.DataParallel]:
         return model
 
 
-def adjust_model(state: dict) -> dict:
+def adjust_model(state: dict) -> OrderedDict:
     """
     # WhenEver a model is trained on multi gpu using DataParallel, module keyword is added
 
@@ -52,7 +53,7 @@ def adjust_model(state: dict) -> dict:
         )
         for key, value in state.items()
     }
-    return model
+    return OrderedDict(model.items())
 
 
 def gpu_variable(

@@ -77,4 +77,5 @@ callbacks.append(CustomCallback(where_to_log_the_callback))
 
 ## Weight File
 
-- [RefineNet](https://github.com/fuzailpalnak/building-footprint-segmentation/releases/download/alpha/refine.zip)
+- [RefineNet trained on INRIA](https://github.com/fuzailpalnak/building-footprint-segmentation/releases/download/alpha/refine.zip)
+- [DlinkNet trained on Massachusetts Buildings Dataset](https://github.com/fuzailpalnak/building-footprint-segmentation/releases/download/alpha/DlinkNet.zip)
