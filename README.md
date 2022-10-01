@@ -110,9 +110,8 @@ for file in glob.glob(
         )
 
 ```
-## Perform Augmentation during prediction and aggregate results
-
-- Follow [Example](https://github.com/fuzailpalnak/building-footprint-segmentation/blob/main/examples/PredictionWithAugmentations.ipynb)
+## Inference 
+- [Perform Augmentation during Inference and aggregate results](https://github.com/fuzailpalnak/building-footprint-segmentation/blob/main/examples/PredictionWithAugmentations.ipynb)
  
 
 ## Segmentation for building footprint
