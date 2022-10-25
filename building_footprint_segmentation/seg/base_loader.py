@@ -3,6 +3,7 @@ from typing import Any
 from pathlib import Path
 
 import torch
+from albumentations import Compose
 from dataclasses import dataclass
 from torch.utils.data import DataLoader, Dataset
 
@@ -20,7 +21,7 @@ class BaseLoader(Dataset):
         root_folder: str,
         image_normalization: str,
         ground_truth_normalization: str,
-        augmenters: dict,
+        augmenters: Compose,
         mode: str,
     ):
         self.mode = mode
@@ -39,7 +40,7 @@ class BaseLoader(Dataset):
         root_folder: str,
         image_normalization: str,
         label_normalization: str,
-        augmenters: dict,
+        augmenters: Compose,
         batch_size: int,
     ):
         train_data = DataLoader(
@@ -57,7 +58,7 @@ class BaseLoader(Dataset):
         )
         val_data = DataLoader(
             dataset=cls(
-                root_folder, image_normalization, label_normalization, dict(), "val"
+                root_folder, image_normalization, label_normalization, Compose([]), "val"
             ),
             shuffle=True,
             num_workers=0,
@@ -67,7 +68,7 @@ class BaseLoader(Dataset):
 
         test_data = DataLoader(
             dataset=cls(
-                root_folder, image_normalization, label_normalization, dict(), "test"
+                root_folder, image_normalization, label_normalization, Compose([]), "test"
             ),
             shuffle=True,
             num_workers=0,

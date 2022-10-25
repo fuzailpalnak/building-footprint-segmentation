@@ -1,5 +1,7 @@
 from typing import List
 
+from albumentations import Compose
+
 from building_footprint_segmentation.helpers.metrics import BinaryMetric
 from building_footprint_segmentation.seg.base_factory import Factory
 from building_footprint_segmentation.seg.binary.loader import BinaryLoader
@@ -14,7 +16,7 @@ class BinaryFactory(Factory):
         root_folder: str,
         image_normalization: str,
         ground_truth_normalization: str,
-        augmenters: dict,
+        augmenters: Compose,
         batch_size: int,
     ):
         return BinaryLoader.get_data_loader(
