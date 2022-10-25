@@ -30,9 +30,6 @@ class BinaryLoader(BaseLoader):
             normalizer, self.ground_truth_normalization
         )
 
-        if mode is "train" and len(self.augmenters) > 0:
-            self.augmenters = from_dict(self.augmenters)
-
     def __len__(self):
         if len(self.images) != 0:
             return len(self.images)

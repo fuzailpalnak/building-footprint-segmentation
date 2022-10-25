@@ -2,6 +2,7 @@ from typing import List
 
 import torch
 import yaml
+from albumentations import Compose
 
 from building_footprint_segmentation.utils.py_network import load_parallel_model
 
@@ -24,7 +25,7 @@ class Segmentation:
         root_folder: str,
         image_normalization: str,
         label_normalization: str,
-        augmenters: dict,
+        augmenters: Compose,
         batch_size: int,
     ):
         return self.segmentation.create_loader(
