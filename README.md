@@ -5,8 +5,7 @@
 ![Python](https://img.shields.io/badge/python-v3.6+-blue.svg)
 ![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)
 ![Licence](https://img.shields.io/github/license/fuzailpalnak/building-footprint-segmentation)
-![Downloads](https://pepy.tech/badge/building-footprint-segmentation)
-
+[![Downloads](https://static.pepy.tech/badge/building-footprint-segmentation)](https://pepy.tech/project/building-footprint-segmentation)
 
 <a href='https://ko-fi.com/fuzailpalnak' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://az743702.vo.msecnd.net/cdn/kofi1.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
