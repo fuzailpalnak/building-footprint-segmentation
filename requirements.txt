@@ -1,6 +1,5 @@
 PyYAML == 5.3.1
 albumentations == 1.3.0
-numpy == 1.19.1
 opencv_python_headless == 4.4.0.44
 py_oneliner == 0.0.1
 scikit_learn == 0.23.2
