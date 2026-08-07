@@ -1,3 +1,4 @@
+﻿import csv
 import datetime
 import logging
 import os
@@ -21,11 +22,16 @@ from building_footprint_segmentation.utils.py_network import (
     convert_tensor_to_numpy,
 )
 
-with warnings.catch_warnings():
-    warnings.filterwarnings("ignore")
-    from torch.utils.tensorboard import SummaryWriter
 
 logger = logging.getLogger("segmentation")
+
+
+def _get_summary_writer():
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore")
+        from torch.utils.tensorboard import SummaryWriter
+
+    return SummaryWriter
 
 
 class CallbackList(object):
@@ -206,6 +212,7 @@ class TensorBoardCallback(Callback):
 
     def __init__(self, log_dir):
         super().__init__(log_dir)
+        SummaryWriter = _get_summary_writer()
         self.writer = SummaryWriter(make_directory(self.log_dir, "events"))
 
     def plt_scalar(self, y, x, tag):
@@ -389,12 +396,312 @@ class BinaryTestCallback(TestDuringTrainingCallback):
             )
 
 
+class MetricsPlotCallback(Callback):
+    """
+    Log per-epoch train/val metrics to CSV and save a YOLO-style results chart.
+    """
+
+    def __init__(self, log_dir):
+        # Keep a stable path (no timestamp) so results.png is easy to find.
+        self.log_dir = log_dir
+        os.makedirs(self.log_dir, exist_ok=True)
+        self.csv_path = os.path.join(self.log_dir, "results.csv")
+        self.plot_path = os.path.join(self.log_dir, "results.png")
+        self.history = []
+        self._fieldnames = None
+
+    def on_epoch_end(self, epoch, logs=None):
+        logs = logs or {}
+        train_metric = logs.get("train_metric") or {}
+        valid_metric = logs.get("valid_metric") or {}
+
+        row = {
+            "epoch": int(epoch),
+            "lr": float(logs.get("lr", 0.0)),
+            "train_loss": float(logs.get("train_loss", 0.0)),
+            "valid_loss": float(logs.get("valid_loss", 0.0)),
+        }
+        for key, value in train_metric.items():
+            row[f"train_{key}"] = float(value)
+        for key, value in valid_metric.items():
+            row[f"valid_{key}"] = float(value)
+
+        self.history.append(row)
+        self._write_csv()
+        # Refresh chart every epoch so a long run still has a usable plot if interrupted.
+        self._plot_results()
+        logger.debug(
+            "Successful on Epoch End {}, Metrics Saved".format(self.__class__.__name__)
+        )
+
+    def on_end(self, logs=None):
+        self._plot_results()
+        one_liner.one_line(
+            tag="Results Chart",
+            tag_data=self.plot_path,
+            tag_color="cyan",
+            to_reset_data=True,
+            to_new_line_data=True,
+        )
+
+    def interruption(self, logs=None):
+        self._plot_results()
+        one_liner.one_line(
+            tag="Results Chart",
+            tag_data=self.plot_path,
+            tag_color="cyan",
+            to_reset_data=True,
+            to_new_line_data=True,
+        )
+
+    def _write_csv(self):
+        if not self.history:
+            return
+        fieldnames = list(self.history[0].keys())
+        self._fieldnames = fieldnames
+        with open(self.csv_path, "w", newline="", encoding="utf-8") as handle:
+            writer = csv.DictWriter(handle, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(self.history)
+
+    def _plot_results(self):
+        if not self.history:
+            return
+
+        try:
+            import matplotlib
+
+            matplotlib.use("Agg")
+            import matplotlib.pyplot as plt
+        except ImportError as exc:
+            raise ImportError(
+                "matplotlib is required for results charts. "
+                "Install with: pip install matplotlib"
+            ) from exc
+
+        epochs = [row["epoch"] for row in self.history]
+        panels = [
+            ("Loss", [("train_loss", "train"), ("valid_loss", "val")]),
+            ("Accuracy", [("train_accuracy", "train"), ("valid_accuracy", "val")]),
+            ("Precision", [("train_precision", "train"), ("valid_precision", "val")]),
+            ("Recall", [("train_recall", "train"), ("valid_recall", "val")]),
+            ("F1", [("train_f1", "train"), ("valid_f1", "val")]),
+            ("IoU", [("train_iou", "train"), ("valid_iou", "val")]),
+            ("Learning Rate", [("lr", "lr")]),
+        ]
+
+        available_panels = []
+        for title, series in panels:
+            usable = [
+                (key, label)
+                for key, label in series
+                if any(key in row for row in self.history)
+            ]
+            if usable:
+                available_panels.append((title, usable))
+
+        cols = 2
+        rows = (len(available_panels) + cols - 1) // cols
+        fig, axes = plt.subplots(rows, cols, figsize=(12, 3.2 * rows), squeeze=False)
+        fig.suptitle("Training Results", fontsize=14, fontweight="bold")
+
+        for index, (title, series) in enumerate(available_panels):
+            ax = axes[index // cols][index % cols]
+            for key, label in series:
+                values = [row.get(key) for row in self.history]
+                ax.plot(epochs, values, marker="o", markersize=2, linewidth=1.5, label=label)
+            ax.set_title(title)
+            ax.set_xlabel("Epoch")
+            ax.grid(True, alpha=0.3)
+            ax.legend(loc="best", fontsize=8)
+
+        for index in range(len(available_panels), rows * cols):
+            axes[index // cols][index % cols].axis("off")
+
+        fig.tight_layout(rect=[0, 0.02, 1, 0.96])
+        fig.savefig(self.plot_path, dpi=150)
+        plt.close(fig)
+
+class PredictionSampleCallback(Callback):
+    """
+    Save a visual GT vs prediction grid for a fixed set of random validation tiles.
+    Updated every epoch so the file always reflects the latest model.
+
+    Rows: image, ground truth, prediction, merge overlay
+    (white=TP, blue=FP, red=FN; background stays black).
+    """
+
+    def __init__(
+        self,
+        log_dir,
+        num_samples: int = 5,
+        threshold: float = 0.20,
+        seed: int = 42,
+    ):
+        self.log_dir = log_dir
+        os.makedirs(self.log_dir, exist_ok=True)
+        self.num_samples = num_samples
+        self.threshold = threshold
+        self.seed = seed
+        self.sample_indices = None
+        self.plot_path = os.path.join(self.log_dir, "predictions.png")
+
+    def on_epoch_end(self, epoch, logs=None):
+        logs = logs or {}
+        model = logs.get("model")
+        val_loader = logs.get("val_loader")
+        if model is None or val_loader is None:
+            logger.debug(
+                "Skipped {} — model or val_loader missing from logs".format(
+                    self.__class__.__name__
+                )
+            )
+            return
+        self._save_prediction_grid(model, val_loader, epoch)
+        logger.debug(
+            "Successful on Epoch End {}, Prediction Grid Saved".format(
+                self.__class__.__name__
+            )
+        )
+
+    def interruption(self, logs=None):
+        logs = logs or {}
+        model = logs.get("model")
+        val_loader = logs.get("val_loader")
+        if model is None or val_loader is None:
+            return
+        epoch = logs.get("state", {}).get("start_epoch", "?")
+        self._save_prediction_grid(model, val_loader, epoch)
+
+    @staticmethod
+    def _pad_to_multiple(images, multiple: int = 32):
+        import torch.nn.functional as F
+
+        _, _, height, width = images.shape
+        pad_height = (multiple - height % multiple) % multiple
+        pad_width = (multiple - width % multiple) % multiple
+        if pad_height or pad_width:
+            images = F.pad(images, (0, pad_width, 0, pad_height))
+        return images, (height, width)
+
+    def _ensure_indices(self, dataset_size: int):
+        if self.sample_indices is not None:
+            return
+        count = min(self.num_samples, dataset_size)
+        rng = __import__("random").Random(self.seed)
+        self.sample_indices = rng.sample(range(dataset_size), count)
+
+    def _save_prediction_grid(self, model, val_loader, epoch):
+        try:
+            import matplotlib
+
+            matplotlib.use("Agg")
+            import matplotlib.pyplot as plt
+            import numpy as np
+        except ImportError as exc:
+            raise ImportError(
+                "matplotlib is required for prediction grids. "
+                "Install with: pip install matplotlib"
+            ) from exc
+
+        dataset = val_loader.dataset
+        if len(dataset) == 0:
+            return
+
+        self._ensure_indices(len(dataset))
+        model.eval()
+
+        images = []
+        grounds = []
+        preds = []
+        merges = []
+
+        with torch.no_grad():
+            for index in self.sample_indices:
+                sample = dataset[index]
+                image = sample["images"].unsqueeze(0)
+                ground = sample["ground_truth"]
+
+                image = gpu_variable(image)
+                padded, (orig_h, orig_w) = self._pad_to_multiple(image)
+                prediction = model(padded).sigmoid()
+                prediction = prediction[:, :, :orig_h, :orig_w]
+                prediction = (prediction >= self.threshold).float()
+
+                image_np = convert_tensor_to_numpy(image[0])
+                if image_np.ndim == 3 and image_np.shape[0] in (1, 3):
+                    image_np = np.moveaxis(image_np, 0, -1)
+                image_np = np.clip(image_np, 0.0, 1.0)
+
+                ground_np = convert_tensor_to_numpy(ground)
+                if ground_np.ndim == 3:
+                    ground_np = ground_np.reshape(ground_np.shape[-2], ground_np.shape[-1])
+
+                pred_np = convert_tensor_to_numpy(prediction[0])
+                if pred_np.ndim == 3:
+                    pred_np = pred_np.reshape(pred_np.shape[-2], pred_np.shape[-1])
+
+                gt_bin = ground_np >= 0.5
+                pred_bin = pred_np >= 0.5
+                merge_np = np.zeros((*gt_bin.shape, 3), dtype=np.float32)
+                # True positive: building correctly predicted → white
+                merge_np[gt_bin & pred_bin] = (1.0, 1.0, 1.0)
+                # False positive: predicted building on background → blue
+                merge_np[~gt_bin & pred_bin] = (0.0, 0.45, 1.0)
+                # False negative: missed ground-truth building → red
+                merge_np[gt_bin & ~pred_bin] = (1.0, 0.15, 0.15)
+
+                images.append(image_np)
+                grounds.append(ground_np)
+                preds.append(pred_np)
+                merges.append(merge_np)
+
+        cols = len(self.sample_indices)
+        fig, axes = plt.subplots(4, cols, figsize=(3.0 * cols, 11.5), squeeze=False)
+        fig.suptitle(
+            "Validation Samples — Epoch {} "
+            "(image / GT / prediction / merge: white=TP, blue=FP, red=FN)".format(
+                epoch
+            ),
+            fontsize=11,
+            fontweight="bold",
+        )
+
+        for col, (image_np, ground_np, pred_np, merge_np) in enumerate(
+            zip(images, grounds, preds, merges)
+        ):
+            axes[0][col].imshow(image_np)
+            axes[0][col].set_title(f"#{self.sample_indices[col]}", fontsize=9)
+            axes[0][col].axis("off")
+
+            axes[1][col].imshow(ground_np, cmap="gray", vmin=0, vmax=1)
+            if col == 0:
+                axes[1][col].set_ylabel("Ground Truth", fontsize=10)
+            axes[1][col].axis("off")
+
+            axes[2][col].imshow(pred_np, cmap="gray", vmin=0, vmax=1)
+            if col == 0:
+                axes[2][col].set_ylabel("Prediction", fontsize=10)
+            axes[2][col].axis("off")
+
+            axes[3][col].imshow(merge_np)
+            if col == 0:
+                axes[3][col].set_ylabel("Merge", fontsize=10)
+            axes[3][col].axis("off")
+
+        fig.tight_layout(rect=[0, 0.02, 1, 0.94])
+        fig.savefig(self.plot_path, dpi=150)
+        plt.close(fig)
+
+
 def load_default_callbacks(log_dir: str):
     return [
         TrainChkCallback(log_dir),
         TimeCallback(log_dir),
         TensorBoardCallback(log_dir),
         TrainStateCallback(log_dir),
+        MetricsPlotCallback(log_dir),
+        PredictionSampleCallback(log_dir),
     ]
 
 

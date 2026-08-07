@@ -14,7 +14,7 @@ except FileNotFoundError:
 
 setup(
     name="building-footprint-segmentation",
-    version="0.2.4",
+    version="0.2.5",
     author="Fuzail Palnak",
     author_email="fuzailpalnak@gmail.com",
     url="https://github.com/fuzailpalnak/building-footprint-segmentation",
@@ -22,7 +22,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=find_packages(),
-    python_requires="~=3.3",
+    python_requires=">=3.9",
     install_requires=install_requires,
     keywords=[
         "Deep Learning",

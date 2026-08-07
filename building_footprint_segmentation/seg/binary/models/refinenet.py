@@ -1,6 +1,7 @@
 from torch import nn, Tensor
 from torch.nn import functional as F
-from torchvision import models
+
+from building_footprint_segmentation.utils.torchvision_compat import load_resnet
 
 __paper__ = "https://arxiv.org/pdf/1611.06612.pdf"
 __reference__ = "https://github.com/GeorgeSeif/Semantic-Segmentation-Suite/blob/master/models/refine_net.py"
@@ -183,7 +184,7 @@ class ReFineNet(nn.Module):
     ):
         super().__init__()
         self.num_classes = num_classes
-        res_net = getattr(models, res_net_to_use)(pretrained=pre_trained_image_net)
+        res_net = load_resnet(res_net_to_use, pre_trained_image_net)
 
         if not top_layers_trainable:
             for param in res_net.parameters():

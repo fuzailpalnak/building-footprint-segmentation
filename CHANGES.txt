@@ -1,1 +1,2 @@
+v0.2.5, 07/16/2026 -- Modernized dependencies (Python 3.9+, PyTorch 2.4+, torchvision weights API), improved GPU device handling, and fixed metric/training compatibility issues.
 v0.2.3, 09/03/2022

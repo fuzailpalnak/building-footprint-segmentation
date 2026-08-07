@@ -4,7 +4,11 @@ import torch
 import yaml
 from albumentations import Compose
 
-from building_footprint_segmentation.utils.py_network import load_parallel_model
+from building_footprint_segmentation.utils.py_network import (
+    extract_state,
+    load_model_state,
+    load_parallel_model,
+)
 
 
 class Segmentation:
@@ -14,7 +18,7 @@ class Segmentation:
     def load_model(self, name: str, transfer_weights: str = None, **kwargs):
         model = self.segmentation.create_network(name, **kwargs)
         if transfer_weights is not None:
-            model.load_state_dict(torch.load(transfer_weights))
+            model.load_state_dict(load_model_state(extract_state(transfer_weights)))
         return load_parallel_model(model)
 
     def load_criterion(self, name: str, **kwargs):

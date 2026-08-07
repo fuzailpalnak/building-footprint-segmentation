@@ -1,0 +1,13 @@
+{
+  "lr": 0.0001,
+  "batch_size": 4,
+  "weight_decay": 0.0001,
+  "criterion": "Dice",
+  "threshold": 0.2,
+  "epochs_per_trial": 20,
+  "selection_metric": "valid_iou",
+  "best_metric_value": 0.9668590772143334,
+  "best_epoch": 1,
+  "trial": "trial_023_lr1em04_bs4_wd1em04_Dice_th0.2",
+  "trial_dir": "outputs\\hyperparam_search_1024\\trial_023_lr1em04_bs4_wd1em04_Dice_th0.2"
+}

@@ -1,0 +1,8 @@
+# GPU install (run in order). Do NOT install torch from PyPI — that gives the CPU build.
+#
+#   pip uninstall -y torch torchvision torchaudio
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+#   pip install -r requirements-gpu.txt
+#   pip install -e .
+
+-r requirements.txt

@@ -86,7 +86,7 @@ class BinaryMetric(MetricList):
         self._threshold = 0.20
 
     def metric_activation(self, prediction):
-        prediction.sigmoid()
+        prediction = prediction.sigmoid()
         prediction[prediction >= self._threshold] = 1
         prediction[prediction < self._threshold] = 0
         return prediction

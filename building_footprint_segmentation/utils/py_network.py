@@ -7,6 +7,10 @@ import numpy as np
 from torch import Tensor
 
 
+def get_device() -> torch.device:
+    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
 def get_gpu_device_ids():
     """
     Get list of available GPU devices
@@ -28,16 +32,13 @@ def load_parallel_model(model) -> Union[Any, torch.nn.DataParallel]:
     :param model:
     :return:
     """
-    if torch.cuda.is_available():
-        device_ids = get_gpu_device_ids()
-        if device_ids:
-            device_ids = list(map(int, device_ids.split(",")))
-        else:
-            device_ids = None
-        model = torch.nn.DataParallel(model, device_ids=device_ids)
-        return model
-    else:
-        return model
+    device = get_device()
+    model = model.to(device)
+    if device.type == "cuda" and torch.cuda.device_count() > 0:
+        device_ids = list(map(int, get_gpu_device_ids().split(",")))
+        if len(device_ids) > 1:
+            model = torch.nn.DataParallel(model, device_ids=device_ids)
+    return model
 
 
 def adjust_model(state: dict) -> OrderedDict:
@@ -71,7 +72,9 @@ def gpu_variable(
             input_variable[k] = gpu_variable(v)
         return input_variable
 
-    return input_variable.cuda() if torch.cuda.is_available() else input_variable
+    if isinstance(input_variable, Tensor):
+        return input_variable.to(get_device())
+    return input_variable
 
 
 def to_input_image_tensor(
@@ -103,18 +106,19 @@ def add_extra_dimension(
     data: Union[List[Tensor], Tensor]
 ) -> Union[List[Tensor], Tensor]:
     if isinstance(data, (list, tuple)):
-        return [torch.unsqueeze(y.cuda(), dim=0) for y in data]
-    return torch.unsqueeze(data, dim=0)
+        return [torch.unsqueeze(gpu_variable(y), dim=0) for y in data]
+    return torch.unsqueeze(gpu_variable(data), dim=0)
 
 
 def convert_tensor_to_numpy(input_variable: Tensor) -> np.ndarray:
-    return (
-        input_variable.data.cpu().numpy()
-        if input_variable.is_cuda
-        else input_variable.data.numpy()
-    )
+    return input_variable.detach().cpu().numpy()
 
 
 def extract_state(weight_path: str) -> dict:
-    state = torch.load(str(weight_path), map_location="cpu")
-    return state
+    return torch.load(str(weight_path), map_location="cpu", weights_only=False)
+
+
+def load_model_state(state: dict) -> OrderedDict:
+    if isinstance(state, dict) and "model" in state:
+        state = state["model"]
+    return adjust_model(state)

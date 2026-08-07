@@ -173,6 +173,8 @@ def load_image(path: str):
     :return:
     """
     img = cv2.imread(path)
+    if img is None:
+        raise ValueError(f"Could not read image: {path}")
     return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
 

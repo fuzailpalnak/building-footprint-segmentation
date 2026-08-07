@@ -112,6 +112,9 @@ class Trainer:
                 epoch_logs = handle_dictionary(
                     epoch_logs, "test_loader", self.loader.test_loader
                 )
+                epoch_logs = handle_dictionary(
+                    epoch_logs, "val_loader", self.loader.val_loader
+                )
 
                 self.callbacks.on_epoch_end(
                     ongoing_epoch,
@@ -225,7 +228,7 @@ class Trainer:
                 ground_truth=train_data["ground_truth"], prediction=prediction
             )
 
-        return mean_loss.item(), self.metrics.compute_mean(), step, progress_bar
+        return float(mean_loss), self.metrics.compute_mean(), step, progress_bar
 
     @torch.no_grad()
     def state_validate(self) -> Tuple[np.ndarray, dict]:

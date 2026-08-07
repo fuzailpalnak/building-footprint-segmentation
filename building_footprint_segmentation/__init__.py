@@ -1,3 +1,7 @@
+from building_footprint_segmentation._env import configure_windows_openmp
+
+configure_windows_openmp()
+
 import logging
 
 logger = logging.getLogger("segmentation")

@@ -1,6 +1,7 @@
 from torch import nn
 import torch
-from torchvision import models
+
+from building_footprint_segmentation.utils.torchvision_compat import load_resnet
 
 __author__ = (
     "Shvets, Alexey & Iglovikov, Vladimir & Rakhlin, Alexander & Kalinin, Alexandr. (2018). Angiodysplasia"
@@ -90,7 +91,7 @@ class AlBuNet(nn.Module):
         self.num_classes = num_classes
 
         self.pool = nn.MaxPool2d(2, 2)
-        self.encoder = getattr(models, res_net_to_use)(pretrained=pre_trained)
+        self.encoder = load_resnet(res_net_to_use, pre_trained)
 
         # self.ict_net = torchvision.models.resnet34(pretrained=pre_trained)
 

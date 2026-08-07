@@ -1,5 +1,6 @@
 from torch import nn
-from torchvision import models
+
+from building_footprint_segmentation.utils.torchvision_compat import load_resnet
 
 __author__ = (
     "Zhou, Lichen, Chuang Zhang, and Ming Wu"
@@ -67,7 +68,7 @@ class DLinkNet34(nn.Module):
         super().__init__()
         self.num_classes = num_classes
         filters = [64, 128, 256, 512]
-        res_net = getattr(models, res_net_to_use)(pretrained=pre_trained_image_net)
+        res_net = load_resnet(res_net_to_use, pre_trained_image_net)
         self.firstconv = res_net.conv1
         self.firstbn = res_net.bn1
         self.firstrelu = res_net.relu
